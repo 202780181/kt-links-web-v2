@@ -69,7 +69,7 @@ export function SiteHeader() {
         {/* 用户菜单 */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full">
+            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full focus-visible:ring-0 focus-visible:ring-offset-0">
               <Avatar className="h-8 w-8">
                 <AvatarImage src="" alt="User" />
                 <AvatarFallback className="bg-primary text-primary-foreground">V</AvatarFallback>

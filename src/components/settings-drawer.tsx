@@ -27,7 +27,7 @@ export function SettingsDrawer({ open, onOpenChange }: SettingsDrawerProps) {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-[400px] sm:w-[540px] p-0 flex flex-col">
+      <SheetContent showClose={false} side="right" className="w-[400px] sm:w-[540px] p-0 flex flex-col">
         <SheetHeader className="px-6 py-4 border-b shrink-0">
           <div className="flex items-center justify-between">
             <SheetTitle className="text-lg font-semibold">自定义设置</SheetTitle>
