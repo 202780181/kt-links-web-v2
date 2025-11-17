@@ -1,0 +1,94 @@
+# GitLab CI/CD 配置
+# 自动构建并上传第三方包到腾讯云 COS
+
+stages:
+  - build
+  - upload
+  - deploy
+
+# 缓存配置
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+    - .pnpm-store/
+
+# 构建任务
+build:
+  stage: build
+  image: node:20-alpine
+  before_script:
+    - npm install -g pnpm
+    - pnpm config set store-dir .pnpm-store
+    - pnpm install --frozen-lockfile
+  script:
+    # 构建项目
+    - pnpm build
+    # 检查构建产物
+    - ls -lh dist/vendor/ || echo "vendor 目录不存在"
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 day
+  only:
+    - main
+    - dev
+    - tags
+
+# 上传到 COS
+upload-to-cos:
+  stage: upload
+  image: node:20-alpine
+  dependencies:
+    - build
+  before_script:
+    - npm install -g pnpm
+    - pnpm config set store-dir .pnpm-store
+    # 只安装上传脚本需要的依赖
+    - pnpm add -D cos-nodejs-sdk-v5 tsx
+  script:
+    # 执行上传脚本
+    - npx tsx build/upload-to-cos.ts
+  artifacts:
+    paths:
+      - dist/cdn-mapping.json
+    expire_in: 1 day
+  only:
+    - main
+    - dev
+    - tags
+  # 允许失败（如果上传失败不影响部署）
+  allow_failure: false
+  # 设置环境变量（在 GitLab CI/CD 设置中配置）
+  # COS_SECRET_ID
+  # COS_SECRET_KEY
+  # COS_BUCKET
+  # COS_REGION
+  # CDN_DOMAIN
+
+# 部署到服务器（示例）
+deploy:
+  stage: deploy
+  image: alpine:latest
+  dependencies:
+    - build
+    - upload-to-cos
+  before_script:
+    - apk add --no-cache rsync openssh-client
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-keyscan -H $DEPLOY_SERVER >> ~/.ssh/known_hosts
+  script:
+    # 部署除了 vendor 目录之外的文件到服务器
+    - rsync -avz --exclude='vendor' dist/ $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH/
+  only:
+    - main
+    - tags
+  when: manual
+  # 需要在 GitLab CI/CD 设置中配置：
+  # SSH_PRIVATE_KEY
+  # DEPLOY_SERVER
+  # DEPLOY_USER
+  # DEPLOY_PATH
+

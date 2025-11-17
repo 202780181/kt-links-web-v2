@@ -1,0 +1,49 @@
+.notfound {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 100px);
+  padding: var(--spacing-3xl);
+}
+
+.notfound__container {
+  text-align: center;
+  color: var(--tea-color-text-primary);
+}
+
+.notfound__image {
+  width: 420px;
+  max-width: 90vw;
+  margin: 0 auto var(--spacing-xl);
+  display: block;
+}
+
+.notfound__title {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.notfound__actions {
+  display: inline-flex;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.notfound__link {
+  color: var(--color-brand-primary);
+}
+
+.notfound__search {
+  width: 520px;
+  max-width: 90vw;
+  margin: 0 auto;
+}
+
+.notfound__input {
+  width: 100%;
+  height: var(--input-height-lg);
+  padding: 0 var(--spacing-lg);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--input-radius);
+  outline: none;
+}
