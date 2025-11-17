@@ -3,8 +3,8 @@ import { RouterProvider } from 'react-router';
 import { router } from '../../router/index.tsx';
 import ClientAuthService from '../../services/clientAuthService.ts';
 import { AuthProvider } from '../../context/AuthContext.tsx';
-import ErrorPage from '../ErrorModal/index.tsx';
-import Loading from '../Loading/index.tsx';
+import ErrorPage from '../error-modal/index.tsx';
+import Loading from '../loading/index.tsx';
 
 type InitStatus = 'loading' | 'success' | 'error';
 

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Navigate, useLocation } from 'react-router'
 import { useAuth } from '@/context/AuthContext'
-import Loading from '@/components/Loading'
+import Loading from '@/components/loading'
 
 interface ProtectedRouteProps {
   children: React.ReactNode

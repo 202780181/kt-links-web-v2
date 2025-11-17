@@ -1,10 +1,10 @@
 import React from 'react';
 import { Outlet } from 'react-router';
 import { NotificationCenterProvider } from '@/context/NotificationCenterContext';
-import NotificationDrawer from '@/components/NotificationCenter';
+import NotificationDrawer from '@/components/notification-center';
 import {
   SidebarProvider,
-} from '@/components/Layout/sidebar';
+} from '@/components/layout/sidebar';
 import { AppSidebar } from '@/components/navigation/app-sidebar';
 import { SiteHeader } from '@/components/navigation/site-header';
 

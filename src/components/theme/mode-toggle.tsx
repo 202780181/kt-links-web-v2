@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { IconBrightness } from "@tabler/icons-react"
-import { useTheme } from "@/components/theme-provider"
+import { useTheme } from "./theme-provider"
 
 import { Button } from "@/components/ui/button"
 

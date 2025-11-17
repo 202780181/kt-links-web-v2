@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/sheet"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
-import { useTheme } from "@/components/theme-provider"
+import { useTheme } from "@/components/theme/theme-provider"
 import lightSvg from "@/assets/image/light.svg"
 import darkSvg from "@/assets/image/dark.svg"
 import followSvg from "@/assets/image/follow.svg"

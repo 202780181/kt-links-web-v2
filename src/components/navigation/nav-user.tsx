@@ -24,7 +24,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/Layout/sidebar"
+} from "@/components/layout/sidebar"
 import { CaretSortIcon, ComponentPlaceholderIcon } from "@radix-ui/react-icons"
 
 export function NavUser({

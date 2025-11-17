@@ -1,6 +1,6 @@
-import { ThemeProvider } from '@/components/theme-provider'
-import { ActiveThemeProvider } from '@/components/active-theme'
-import MainLayout from './components/Layout/MainLayout'
+import { ThemeProvider } from '@/components/theme/theme-provider'
+import { ActiveThemeProvider } from '@/components/theme/active-theme'
+import MainLayout from './components/layout/main-layout'
 import '@/theme.css'
 
 function App() {

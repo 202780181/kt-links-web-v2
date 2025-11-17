@@ -20,7 +20,7 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-} from '@/components/Layout/sidebar'
+} from '@/components/layout/sidebar'
 
 const data = {
   teams: [

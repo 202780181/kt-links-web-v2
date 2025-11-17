@@ -12,7 +12,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/Layout/sidebar"
+} from "@/components/layout/sidebar"
 import { ChevronRightIcon } from "@radix-ui/react-icons"
 
 export function NavMain({

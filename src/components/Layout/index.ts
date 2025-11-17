@@ -1,5 +1,5 @@
-export { default as MainLayout } from './MainLayout'
-export { default as SimpleLayout } from './SimpleLayout'
+export { default as MainLayout } from './main-layout'
+export { default as SimpleLayout } from './simple-layout'
 
 // Sidebar components
 export {

@@ -20,7 +20,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/Layout/sidebar"
+} from "@/components/layout/sidebar"
 import { DotsHorizontalIcon } from "@radix-ui/react-icons"
 
 export function NavProjects({

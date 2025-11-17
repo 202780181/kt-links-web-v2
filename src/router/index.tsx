@@ -1,8 +1,8 @@
 import { createBrowserRouter } from 'react-router'
 import { lazy, Suspense } from 'react'
 import App from '../App'
-import ProtectedRoute from '../components/ProtectedRoute'
-import Loading from '../components/Loading'
+import ProtectedRoute from '../components/protected-route'
+import Loading from '../components/loading'
 
 // 懒加载页面组件
 const HomePage = lazy(() => import('@/pages/home'))
@@ -16,7 +16,7 @@ const AccountSecurityPage = lazy(() => import('@/pages/account/SecurityPage'))
 const AccountAccessPage = lazy(() => import('@/pages/account/AccessPage'))
 const AccountLayout = lazy(() => import('@/pages/account/AccountLayout'))
 const SimpleLayout = lazy(() =>
-  import('../components/Layout/SimpleLayout'),
+  import('../components/layout/simple-layout'),
 )
 // 懒加载包装组件
 const LazyWrapper = ({ children }: { children: React.ReactNode }) => (
