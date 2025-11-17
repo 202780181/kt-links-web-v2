@@ -12,9 +12,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { SettingsDrawer } from "@/components/settings/settings-drawer"
+import { NotificationDrawer } from "@/components/notification-center"
 
 export function SiteHeader() {
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [notificationOpen, setNotificationOpen] = useState(false)
 
   return (
     <>
@@ -46,11 +48,15 @@ export function SiteHeader() {
         {/* 帮助和通知组 */}
         <div className="flex items-center">
           {/* 通知 */}
-          <Button variant="ghost" size="icon" className="h-10 w-10 relative">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-10 w-10 relative"
+            onClick={() => setNotificationOpen(true)}
+          >
             <Bell className="h-5 w-5" />
             <Badge 
-              variant="destructive" 
-              className="absolute top-0 right-0 h-5 w-5 rounded-full p-0 flex items-center justify-center text-[10px]"
+              className="absolute top-0 right-0 h-5 w-5 rounded-full p-0 flex items-center justify-center text-[10px] bg-blue-500 text-white hover:bg-blue-600"
             >
               3
             </Badge>
@@ -139,6 +145,7 @@ export function SiteHeader() {
     </header>
 
     <SettingsDrawer open={settingsOpen} onOpenChange={setSettingsOpen} />
+    <NotificationDrawer open={notificationOpen} onOpenChange={setNotificationOpen} />
     </>
   )
 }

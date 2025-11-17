@@ -1,92 +1,113 @@
-import React, { useEffect, useRef } from 'react';
-import ReactDOM from 'react-dom';
-import { useNotificationCenter } from '@/context/NotificationCenterContext';
-import './index.scss';
+import { Check } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetClose,
+} from "@/components/ui/sheet"
+import { Badge } from "@/components/ui/badge"
+import { X } from "lucide-react"
 
-const NotificationDrawer: React.FC = () => {
-  const { isOpen, close, notifications, loading, error, fetchMore, pageInfo, markAllAsRead } = useNotificationCenter();
-  const drawerRef = useRef<HTMLElement | null>(null);
+interface NotificationDrawerProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}
 
-  // 处理 Esc 关闭
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') close();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [close]);
+interface Notification {
+  id: string
+  title: string
+  category: string
+  time: string
+  isRead: boolean
+}
 
-  // 点击页面其他区域关闭抽屉（无遮罩场景）
-  useEffect(() => {
-    if (!isOpen) return;
-    const onMouseDown = (e: MouseEvent) => {
-      const target = e.target as Node & { closest?: (sel: string) => Element | null };
-      // 若点击来源于小铃铛按钮，则不在此处处理关闭，交由按钮自身的 toggle 处理
-      if (typeof (target as any).closest === 'function') {
-        const bell = (target as any).closest('.notification-bell');
-        if (bell) return;
-      }
-      if (drawerRef.current && !drawerRef.current.contains(target)) {
-        close();
-      }
-    };
-    // 使用捕获阶段，尽量早于内部点击处理
-    document.addEventListener('mousedown', onMouseDown, true);
-    return () => document.removeEventListener('mousedown', onMouseDown, true);
-  }, [isOpen, close]);
+const mockNotifications: Notification[] = [
+  {
+    id: "1",
+    title: "腾讯云SSL证书即将过期通知",
+    category: "产品消息",
+    time: "2025-11-16 11:31:12",
+    isRead: false,
+  },
+  {
+    id: "2",
+    title: "【腾讯云CDN】证书即将过期提醒",
+    category: "产品消息",
+    time: "2025-11-16 09:44:59",
+    isRead: false,
+  },
+  {
+    id: "3",
+    title: "【SSL 证书】关于2025年11月27日腾讯云 SSL 证书服...",
+    category: "运维消息",
+    time: "2025-11-14 19:22:29",
+    isRead: false,
+  },
+  {
+    id: "4",
+    title: "【对象存储 COS】资源包购买成功通知",
+    category: "产品消息",
+    time: "2025-11-04 13:56:55",
+    isRead: false,
+  },
+]
 
-  if (typeof document === 'undefined') return null;
-
-  return ReactDOM.createPortal(
-    <div className={`nc-container ${isOpen ? 'nc-container--visible' : ''}`} aria-hidden={!isOpen}>
-      <aside ref={drawerRef} className={`nc-drawer ${isOpen ? 'nc-drawer--open' : ''}`} role="dialog" aria-label="通知中心">
-        <header className="nc-drawer__header">
-          <h3 className="nc-drawer__title">站内信</h3>
-          <div className="nc-drawer__actions">
-            <button className="nc-btn" onClick={() => markAllAsRead()}>全部已读</button>
-            <button className="nc-btn nc-btn--ghost" onClick={() => close()}>关闭</button>
-          </div>
-        </header>
-
-        <div className="nc-drawer__body">
-          {loading && notifications.length === 0 && (
-            <div className="nc-empty">加载中...</div>
-          )}
-          {error && (
-            <div className="nc-error">{error}</div>
-          )}
-          {!loading && notifications.length === 0 && !error && (
-            <div className="nc-empty">暂无通知</div>
-          )}
-
-          <ul className="nc-list">
-            {notifications.map(n => (
-              <li key={n.id} className={`nc-item ${n.isRead ? '' : 'nc-item--unread'}`}>
-                <div className="nc-item__meta">
-                  <span className="nc-item__cat">{n.subTitle || n.category || '通知'}</span>
-                  <time className="nc-item__time">{new Date(n.createdAt).toLocaleString()}</time>
-                </div>
-                <div className="nc-item__title">
-                  {n.link ? (
-                    <a href={n.link}>{n.title}</a>
-                  ) : (
-                    <span>{n.title}</span>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-
-          {pageInfo.hasMore && (
-            <div className="nc-footer">
-              <button className="nc-btn" onClick={() => fetchMore()}>加载更多</button>
+export function NotificationDrawer({ open, onOpenChange }: NotificationDrawerProps) {
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent 
+        showClose={false} 
+        showOverlay={false}
+        offsetTop="3.5rem"
+        side="right" 
+        className="w-[600px] p-0 flex flex-col"
+      >
+        <SheetHeader className="px-6 py-4 border-b shrink-0">
+          <div className="flex items-center justify-between">
+            <SheetTitle className="text-lg font-semibold">站内信</SheetTitle>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" className="h-8 text-sm">
+                <Check className="h-4 w-4 mr-1" />
+                全部已读
+              </Button>
+              <SheetClose asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <X className="h-4 w-4" />
+                </Button>
+              </SheetClose>
             </div>
-          )}
-        </div>
-      </aside>
-    </div>,
-    document.body
-  );
-};
+          </div>
+        </SheetHeader>
 
-export default NotificationDrawer;
+        <div className="flex-1 overflow-y-auto">
+          <div className="divide-y">
+            {mockNotifications.map((notification) => (
+              <div
+                key={notification.id}
+                className="px-6 py-4 hover:bg-accent/50 cursor-pointer transition-colors border-l-4 border-l-blue-500"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-sm mb-2 truncate">
+                      {notification.title}
+                    </h3>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary" className="text-xs">
+                        {notification.category}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground">
+                        {notification.time}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </SheetContent>
+    </Sheet>
+  )
+}

@@ -1,7 +1,6 @@
 import React from 'react'
 import { cn } from '@/lib/utils'
 import { NotificationCenterProvider } from '@/context/NotificationCenterContext'
-import NotificationDrawer from '@/components/notification-center'
 
 interface SimpleLayoutProps extends React.PropsWithChildren {
   className?: string
@@ -25,7 +24,6 @@ const SimpleLayout: React.FC<SimpleLayoutProps> = ({
           {children}
         </main>
       </div>
-      <NotificationDrawer />
     </NotificationCenterProvider>
   )
 }

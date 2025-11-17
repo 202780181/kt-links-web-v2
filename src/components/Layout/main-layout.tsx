@@ -1,7 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router';
 import { NotificationCenterProvider } from '@/context/NotificationCenterContext';
-import NotificationDrawer from '@/components/notification-center';
 import {
   SidebarProvider,
 } from '@/components/layout/sidebar';
@@ -51,7 +50,6 @@ const MainLayout: React.FC = () => {
           </div>
         </SidebarProvider>
       </div>
-      <NotificationDrawer />
     </NotificationCenterProvider>
   );
 };
