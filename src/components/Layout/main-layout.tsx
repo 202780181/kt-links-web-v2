@@ -40,11 +40,9 @@ const MainLayout: React.FC = () => {
         >
           <div className="flex flex-1 overflow-hidden">
             <AppSidebar variant="inset" />
-            <main className="flex flex-1 flex-col overflow-y-auto">
-              <div className="@container/main flex flex-1 flex-col gap-2">
-                <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-                  <Outlet />
-                </div>
+            <main className="flex flex-1 flex-col overflow-hidden">
+              <div className="@container/main flex flex-1 flex-col overflow-hidden">
+                <Outlet />
               </div>
             </main>
           </div>

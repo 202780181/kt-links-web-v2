@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Search, Settings, Bell, User, FileText, Github, Lock, LogOut, HelpCircle } from "lucide-react"
+import { useAuth } from "@/context/AuthContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -17,6 +18,13 @@ import { NotificationDrawer } from "@/components/notification-center"
 export function SiteHeader() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [notificationOpen, setNotificationOpen] = useState(false)
+  const { userProfile } = useAuth()
+
+  // 获取用户名称的首字母作为头像
+  const getInitials = (name: string | undefined) => {
+    if (!name) return 'U'
+    return name.charAt(0).toUpperCase()
+  }
 
   return (
     <>
@@ -77,8 +85,10 @@ export function SiteHeader() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full focus-visible:ring-0 focus-visible:ring-offset-0">
               <Avatar className="h-8 w-8">
-                <AvatarImage src="" alt="User" />
-                <AvatarFallback className="bg-primary text-primary-foreground">V</AvatarFallback>
+                <AvatarImage src="" alt={userProfile?.name || 'User'} />
+                <AvatarFallback className="bg-primary text-primary-foreground">
+                  {getInitials(userProfile?.name)}
+                </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
@@ -87,19 +97,23 @@ export function SiteHeader() {
             <div className="flex items-center gap-3 p-3">
               <div className="relative">
                 <Avatar className="h-12 w-12">
-                  <AvatarImage src="" alt="Vben" />
+                  <AvatarImage src="" alt={userProfile?.name || 'User'} />
                   <AvatarFallback className="bg-gradient-to-br from-pink-400 to-orange-400 text-white text-lg">
-                    V
+                    {getInitials(userProfile?.name)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 ring-2 ring-background" />
               </div>
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold">Vben</span>
-                  <Badge variant="secondary" className="text-xs">Pro</Badge>
+                  <span className="font-semibold">{userProfile?.name || '未登录'}</span>
+                  {userProfile?.type === '1' && (
+                    <Badge variant="secondary" className="text-xs">管理员</Badge>
+                  )}
                 </div>
-                <span className="text-xs text-muted-foreground">ann.vben@gmail.com</span>
+                <span className="text-xs text-muted-foreground">
+                  {userProfile?.email || userProfile?.account || '请登录'}
+                </span>
               </div>
             </div>
             

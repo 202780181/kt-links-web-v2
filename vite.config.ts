@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 import rollupConfig from './build/rollup.config';
 
 // https://vite.dev/config/
-export default defineConfig(() => ({
+export default defineConfig(({ mode }) => ({
   plugins: [
     react()
   ],
@@ -30,7 +30,8 @@ export default defineConfig(() => ({
     devSourcemap: true,
   },
   esbuild: {
-    drop: ['console', 'debugger']
+    // 只在生产环境移除 console 和 debugger
+    drop: mode === 'production' ? ['console', 'debugger'] : []
   },
   // 开发环境启用 Source Map
   define: {

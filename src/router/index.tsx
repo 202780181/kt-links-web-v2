@@ -18,6 +18,7 @@ const AccountLayout = lazy(() => import('@/pages/account/AccountLayout'))
 const SimpleLayout = lazy(() =>
   import('../components/layout/simple-layout'),
 )
+const MenuListPage = lazy(() => import('../pages/menu'))
 // 懒加载包装组件
 const LazyWrapper = ({ children }: { children: React.ReactNode }) => (
   <Suspense fallback={<Loading />}>{children}</Suspense>
@@ -40,6 +41,14 @@ export const router = createBrowserRouter([
             <HomePage />
           </LazyWrapper>
         ),
+      },
+       {
+        path: 'menu',
+        element: (
+          <LazyWrapper>
+            <MenuListPage />
+          </LazyWrapper>
+        )
       },
       // 本地静态路由：开发者中心（账号中心）
       {
