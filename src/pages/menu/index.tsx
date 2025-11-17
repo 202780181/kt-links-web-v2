@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { DataTable } from '@/components/table'
+import { CreateMenuDrawer } from './create-menu'
 
 // 菜单数据接口
 interface MenuData {
@@ -196,10 +197,11 @@ const createColumns = (
 ]
 
 export default function MenuPage() {
-  const [data, setData] = useState<MenuData[]>([])
+  const [data, setData] = useState<MenuData[]>([])  
   const [menuTypes, setMenuTypes] = useState<SystemTypeOption[]>([])
   const [loading, setLoading] = useState(true)
   const [searchValue, setSearchValue] = useState('')
+  const [createDrawerOpen, setCreateDrawerOpen] = useState(false)
 
   // 加载菜单类型
   useEffect(() => {
@@ -296,15 +298,31 @@ export default function MenuPage() {
     }
   }
 
+  const handleCreateMenu = async (formData: any) => {
+    try {
+      // 这里应该调用创建菜单的 API
+      console.log('创建菜单:', formData)
+      toast.success('菜单创建成功')
+      loadMenuList() // 重新加载数据
+    } catch (error) {
+      console.error('创建菜单失败:', error)
+      toast.error('创建菜单失败')
+    }
+  }
+
   const columns = createColumns(menuTypes, handleView, handleDelete)
 
   return (
-    <div className="flex w-full flex-col gap-6 p-4" style={{ height: 'calc(100vh - 64px)' }}>
+    <div className="flex w-full flex-col gap-4 p-4" style={{ height: 'calc(100vh - 64px)' }}>
       {/* 工具栏 */}
       <div className="flex items-center justify-between">
         {/* 左侧按钮组 */}
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => setCreateDrawerOpen(true)}
+          >
             <IconPlus />
             <span className="hidden lg:inline">添加</span>
           </Button>
@@ -340,9 +358,15 @@ export default function MenuPage() {
           loading={loading}
           showPagination={true}
           initialPageSize={10}
-          fillHeight={true}
         />
       </div>
+
+      {/* 创建菜单抽屉 */}
+      <CreateMenuDrawer
+        open={createDrawerOpen}
+        onOpenChange={setCreateDrawerOpen}
+        onSubmit={handleCreateMenu}
+      />
     </div>
   )
 }

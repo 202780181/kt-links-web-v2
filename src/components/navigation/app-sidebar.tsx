@@ -45,7 +45,6 @@ const data = {
       title: '首页',
       url: '/',
       icon: Home,
-      isActive: true,
     },
     {
       title: '菜单',

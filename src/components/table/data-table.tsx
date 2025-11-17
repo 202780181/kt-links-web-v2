@@ -34,7 +34,6 @@ interface DataTableProps<TData, TValue> {
   onRowSelectionChange?: (selectedRows: TData[]) => void
   emptyMessage?: string
   loadingMessage?: string
-  fillHeight?: boolean  // 是否占满剩余高度
 }
 
 export function DataTable<TData, TValue>({
@@ -47,7 +46,6 @@ export function DataTable<TData, TValue>({
   onRowSelectionChange,
   emptyMessage = '暂无数据',
   loadingMessage = '加载中...',
-  fillHeight = false,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -92,11 +90,9 @@ export function DataTable<TData, TValue>({
   })
 
   return (
-    <div className={fillHeight ? "flex flex-col gap-4 h-full" : "flex flex-col gap-4"}>
+    <div className="flex flex-col gap-4 h-full">
       {/* 表格容器 */}
-      <div 
-        className={fillHeight ? "flex-1 min-h-0 rounded-lg border overflow-auto data-table-scroll" : "rounded-lg border overflow-x-auto data-table-scroll"}
-      >
+      <div className="flex-1 min-h-0 rounded-lg border overflow-auto data-table-scroll">
         <table className="w-full caption-bottom text-sm table-fixed">
           <thead className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
             {table.getHeaderGroups().map((headerGroup) => (

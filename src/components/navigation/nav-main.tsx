@@ -1,4 +1,5 @@
 import { type LucideIcon } from "lucide-react"
+import { Link, useLocation } from "react-router"
 
 import {
   Collapsible,
@@ -29,6 +30,7 @@ export function NavMain({
     }[]
   }[]
 }) {
+  const location = useLocation()
   return (
     <div className="p-2">
       <SidebarMenu>
@@ -55,9 +57,9 @@ export function NavMain({
                       {item.items.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton asChild>
-                            <a href={subItem.url}>
+                            <Link to={subItem.url}>
                               <span>{subItem.title}</span>
-                            </a>
+                            </Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}
@@ -69,13 +71,14 @@ export function NavMain({
           }
 
           // 如果没有子菜单，直接渲染为链接
+          const isActive = location.pathname === item.url || item.isActive
           return (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild isActive={item.isActive}>
-                <a href={item.url}>
+              <SidebarMenuButton asChild isActive={isActive}>
+                <Link to={item.url}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
-                </a>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           )
