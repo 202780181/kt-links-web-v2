@@ -24,6 +24,16 @@ import {
 import { TablePagination } from './table-pagination'
 import './data-table.css'
 
+// 自定义分页配置接口
+interface CustomPaginationConfig {
+  pageSize: number
+  hasNext: boolean
+  hasPrevious: boolean
+  onPageSizeChange: (newSize: number) => void
+  onPrevPage: () => void
+  onNextPage: () => void
+}
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
@@ -32,6 +42,8 @@ interface DataTableProps<TData, TValue> {
   pageSizeOptions?: number[]
   initialPageSize?: number
   onRowSelectionChange?: (selectedRows: TData[]) => void
+  onPaginationChange?: (pagination: PaginationState) => void
+  pagination?: CustomPaginationConfig  // 新增：自定义分页配置
   emptyMessage?: string
   loadingMessage?: string
 }
@@ -41,9 +53,11 @@ export function DataTable<TData, TValue>({
   data,
   loading = false,
   showPagination = true,
-  pageSizeOptions = [10, 20, 30, 40, 50],
-  initialPageSize = 10,
+  pageSizeOptions = [10, 20, 50, 100, 200],
+  initialPageSize = 50,
   onRowSelectionChange,
+  onPaginationChange,
+  pagination: customPagination,
   emptyMessage = '暂无数据',
   loadingMessage = '加载中...',
 }: DataTableProps<TData, TValue>) {
@@ -80,7 +94,13 @@ export function DataTable<TData, TValue>({
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
-    onPaginationChange: setPagination,
+    onPaginationChange: (updater) => {
+      const newPagination = typeof updater === 'function' ? updater(pagination) : updater
+      setPagination(newPagination)
+      if (onPaginationChange) {
+        onPaginationChange(newPagination)
+      }
+    },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -158,7 +178,11 @@ export function DataTable<TData, TValue>({
 
       {/* 分页 */}
       {showPagination && (
-        <TablePagination table={table} pageSizeOptions={pageSizeOptions} />
+        <TablePagination 
+          table={table} 
+          pageSizeOptions={pageSizeOptions}
+          customPagination={customPagination}
+        />
       )}
     </div>
   )

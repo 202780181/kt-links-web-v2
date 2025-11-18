@@ -42,6 +42,7 @@ interface MenuPageResponse {
 	nextCursor: string;
 	prevCursor: string;
 	cursorType: string;
+	cursorCreateTs?: string;  // 游标创建时间，可选
 	data: MenuItem[];
 }
 

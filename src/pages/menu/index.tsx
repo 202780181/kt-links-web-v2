@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { type ColumnDef } from '@tanstack/react-table'
 import {
   IconPlus,
@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { DataTable } from '@/components/table'
+import { DeleteConfirmButton } from '@/components/ui/delete-confirm'
 import { CreateMenuDrawer } from './create-menu'
 
 // 菜单数据接口
@@ -183,14 +184,19 @@ const createColumns = (
         >
           <span>查看</span>
         </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="p-0 hover:text-destructive hover:underline"
-          onClick={() => onDelete(row.original.menuId)}
+        <DeleteConfirmButton
+          onConfirm={() => onDelete(row.original.menuId)}
+          title="确认删除菜单"
+          description={`确定要删除菜单"${row.original.menuName}"吗？此操作无法撤销。`}
         >
-          <span>删除</span>
-        </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="p-0 hover:text-destructive hover:underline"
+          >
+            <span>删除</span>
+          </Button>
+        </DeleteConfirmButton>
       </div>
     ),
   },
@@ -202,6 +208,15 @@ export default function MenuPage() {
   const [loading, setLoading] = useState(true)
   const [searchValue, setSearchValue] = useState('')
   const [createDrawerOpen, setCreateDrawerOpen] = useState(false)
+  
+  // 分页状态
+  const [pageSize, setPageSize] = useState(50)
+  const [hasNext, setHasNext] = useState(false)
+  const [hasPrevious, setHasPrevious] = useState(false)
+  const [nextCursor, setNextCursor] = useState('')
+  const [prevCursor, setPrevCursor] = useState('')
+  const [cursorType, setCursorType] = useState<string>('')
+  const [cursorCreateTs, setCursorCreateTs] = useState<string>('')
 
   // 加载菜单类型
   useEffect(() => {
@@ -220,11 +235,19 @@ export default function MenuPage() {
   }, [])
 
   // 加载菜单列表
-  const loadMenuList = async () => {
+  const loadMenuList = useCallback(async (params?: {
+    size?: number
+    cursorId?: string
+    cursorCreateTs?: string
+    cursorType?: 'up' | 'down'
+  }) => {
     setLoading(true)
     try {
       const response = await getMenuPageList({
-        size: 50,
+        size: params?.size || pageSize,
+        cursorId: params?.cursorId,
+        cursorCreateTs: params?.cursorCreateTs,
+        cursorType: params?.cursorType,
         parentId: 0, // 查询顶级菜单
       })
 
@@ -245,24 +268,16 @@ export default function MenuPage() {
           createTime: formatTimestamp(item.createTs),
         }))
 
-        // 创建40条假数据
-        const fakeData: MenuData[] = Array.from({ length: 40 }, (_, index) => ({
-          key: `fake-${index + 1}`,
-          menuName: `测试菜单${index + 1}`,
-          menuId: `fake-${index + 1}`,
-          menuStatus: index % 2 === 0 ? '1' : '0',
-          menuType: (index % 3) as 0 | 1 | 2,
-          menuCode: `test_menu_${index + 1}`,
-          routePath: `/test/menu${index + 1}`,
-          parentId: '0',
-          sort: index + 1,
-          visible: index % 3 === 0 ? 'false' : 'true',
-          cached: index % 2 === 0 ? 'true' : 'false',
-          createTime: formatTimestamp(Date.now() - index * 86400000),
-        }))
-
-        // 合并真实数据和假数据
-        setData([...realData, ...fakeData])
+        // 设置真实数据
+        setData(realData)
+        
+        // 更新分页信息
+        setHasNext(response.data.hasNext)
+        setHasPrevious(response.data.hasPrevious)
+        setNextCursor(response.data.nextCursor || '')
+        setPrevCursor(response.data.prevCursor || '')
+        setCursorType(response.data.cursorType || '')
+        setCursorCreateTs(response.data.cursorCreateTs || '')
       }
     } catch (error) {
       console.error('加载菜单列表失败:', error)
@@ -270,15 +285,15 @@ export default function MenuPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [pageSize]) // 依赖 pageSize
 
   useEffect(() => {
-    loadMenuList()
+    loadMenuList() 
   }, [])
 
   // 查看菜单
   const handleView = (id: string) => {
-    toast.info(`查看菜单: ${id}`)
+    toast.error(`查看菜单: ${id}`)
     // TODO: 实现查看逻辑
   }
 
@@ -303,10 +318,38 @@ export default function MenuPage() {
       // 这里应该调用创建菜单的 API
       console.log('创建菜单:', formData)
       toast.success('菜单创建成功')
-      loadMenuList() // 重新加载数据
+      loadMenuList() // 使用当前页面大小重新加载数据
     } catch (error) {
       console.error('创建菜单失败:', error)
       toast.error('创建菜单失败')
+    }
+  }
+
+  // 处理分页大小变化
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize)
+    loadMenuList({ size: newSize })
+  }
+  
+  // 处理上一页
+  const handlePrevPage = () => {
+    if (hasPrevious && prevCursor) {
+      loadMenuList({ 
+        cursorId: prevCursor, 
+        cursorCreateTs: cursorCreateTs || undefined,
+        cursorType: cursorType ? cursorType as 'up' | 'down' : 'up'
+      })
+    }
+  }
+  
+  // 处理下一页
+  const handleNextPage = () => {
+    if (hasNext && nextCursor) {
+      loadMenuList({ 
+        cursorId: nextCursor, 
+        cursorCreateTs: cursorCreateTs || undefined,
+        cursorType: cursorType ? cursorType as 'up' | 'down' : 'down'
+      })
     }
   }
 
@@ -357,7 +400,14 @@ export default function MenuPage() {
           data={data}
           loading={loading}
           showPagination={true}
-          initialPageSize={10}
+          pagination={{
+            pageSize: pageSize,
+            hasNext: hasNext,
+            hasPrevious: hasPrevious,
+            onPageSizeChange: handlePageSizeChange,
+            onPrevPage: handlePrevPage,
+            onNextPage: handleNextPage,
+          }}
         />
       </div>
 
@@ -366,6 +416,7 @@ export default function MenuPage() {
         open={createDrawerOpen}
         onOpenChange={setCreateDrawerOpen}
         onSubmit={handleCreateMenu}
+        menuTypeOptions={menuTypes}
       />
     </div>
   )
