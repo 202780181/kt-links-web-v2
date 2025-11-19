@@ -121,8 +121,8 @@ export function DataTable<TData, TValue>({
     <div className="flex flex-col gap-4" style={heightStyle}>
       {/* 表格容器 - 如果设置了高度则使用自定义滚动条 */}
       {tableHeight ? (
-        <CustomScrollbar height="100%" className="flex-1 min-h-0" showShadows={false}>
-          <div className="rounded-lg border">
+        <div className="rounded-lg border overflow-hidden flex-1 min-h-0">
+          <CustomScrollbar height="100%" showShadows={false}>
             <table className="w-full caption-bottom text-sm table-fixed">
               <thead className="bg-muted sticky top-0 z-20 [&_tr]:border-b">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -192,8 +192,8 @@ export function DataTable<TData, TValue>({
             )}
               </tbody>
             </table>
-          </div>
-        </CustomScrollbar>
+          </CustomScrollbar>
+        </div>
       ) : (
         <div className="rounded-lg border">
           <table className="w-full caption-bottom text-sm table-fixed">
