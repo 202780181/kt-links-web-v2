@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router'
 import { type ColumnDef } from '@tanstack/react-table'
 import {
   IconPlus,
@@ -42,7 +43,8 @@ interface MenuData {
 const createColumns = (
   menuTypes: SystemTypeOption[],
   onView: (id: string) => void,
-  onDelete: (id: string) => void
+  onDelete: (id: string) => void,
+  onNameClick: (id: string) => void
 ): ColumnDef<MenuData>[] => [
   {
     id: 'select',
@@ -76,7 +78,13 @@ const createColumns = (
     size: 120,
     header: '菜单名称',
     cell: ({ row }) => (
-      <div className="font-medium">{row.getValue('menuName')}</div>
+      <Button
+        variant="link"
+        className="p-0 h-auto font-medium text-primary hover:underline"
+        onClick={() => onNameClick(row.original.menuId)}
+      >
+        {row.getValue('menuName')}
+      </Button>
     ),
     enableHiding: false,
   },
@@ -203,6 +211,7 @@ const createColumns = (
 ]
 
 export default function MenuPage() {
+  const navigate = useNavigate()
   const [data, setData] = useState<MenuData[]>([])  
   const [menuTypes, setMenuTypes] = useState<SystemTypeOption[]>([])
   const [loading, setLoading] = useState(true)
@@ -353,7 +362,12 @@ export default function MenuPage() {
     }
   }
 
-  const columns = createColumns(menuTypes, handleView, handleDelete)
+  // 处理菜单名称点击
+  const handleNameClick = (id: string) => {
+    navigate(`/menu/${id}`)
+  }
+
+  const columns = createColumns(menuTypes, handleView, handleDelete, handleNameClick)
 
   return (
     <div className="flex w-full flex-col gap-4 p-4" style={{ height: 'calc(100vh - 64px)' }}>

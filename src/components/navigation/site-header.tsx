@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useNavigate } from "react-router"
 import { Search, Settings, Bell, User, FileText, Github, Lock, LogOut, HelpCircle } from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
 import { Button } from "@/components/ui/button"
@@ -19,6 +20,7 @@ export function SiteHeader() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [notificationOpen, setNotificationOpen] = useState(false)
   const { userProfile } = useAuth()
+  const navigate = useNavigate()
 
   // 获取用户名称的首字母作为头像
   const getInitials = (name: string | undefined) => {
@@ -120,9 +122,9 @@ export function SiteHeader() {
             <DropdownMenuSeparator />
             
             {/* 菜单项 */}
-            <DropdownMenuItem className="gap-2 py-2">
+            <DropdownMenuItem className="gap-2 py-2" onClick={() => navigate('/developer/info')}>
               <User className="h-4 w-4" />
-              <span>个人中心</span>
+              <span>账户信息</span>
             </DropdownMenuItem>
             
             <DropdownMenuItem className="gap-2 py-2">

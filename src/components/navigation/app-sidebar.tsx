@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { useLocation } from 'react-router'
 import {
   AudioWaveform,
   Command,
@@ -11,6 +12,10 @@ import {
   Key,
   AppWindow,
   Building2,
+  User,
+  Shield,
+  Lock,
+  Settings,
 } from 'lucide-react'
 
 import { NavMain } from '@/components/navigation/nav-main'
@@ -72,16 +77,42 @@ const data = {
       icon: Building2,
     },
   ],
+  // 账户中心专用菜单
+  developerNav: [
+    {
+      title: '账号信息',
+      url: '/developer/info',
+      icon: User,
+    },
+    {
+      title: '实名认证',
+      url: '/developer/auth',
+      icon: Shield,
+    },
+    {
+      title: '安全设置',
+      url: '/developer/security',
+      icon: Settings,
+    },
+    {
+      title: '访问管理',
+      url: '/developer/access',
+      icon: Lock,
+    },
+  ],
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const location = useLocation()
+  const isDeveloperPage = location.pathname.startsWith('/developer')
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={isDeveloperPage ? data.developerNav : data.navMain} />
       </SidebarContent>
       <SidebarFooter />
     </Sidebar>
