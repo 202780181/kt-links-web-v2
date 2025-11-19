@@ -22,6 +22,7 @@ import { Input } from '@/components/ui/input'
 import { DataTable } from '@/components/table'
 import { DeleteConfirmButton } from '@/components/ui/delete-confirm'
 import { CreateMenuDrawer } from './create-menu'
+import { ListPageContainer } from '@/components/layout'
 
 // 菜单数据接口
 interface MenuData {
@@ -370,45 +371,47 @@ export default function MenuPage() {
   const columns = createColumns(menuTypes, handleView, handleDelete, handleNameClick)
 
   return (
-    <div className="flex w-full flex-col gap-4 p-4" style={{ height: 'calc(100vh - 64px)' }}>
-      {/* 工具栏 */}
-      <div className="flex items-center justify-between">
-        {/* 左侧按钮组 */}
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => setCreateDrawerOpen(true)}
-          >
-            <IconPlus />
-            <span className="hidden lg:inline">添加</span>
-          </Button>
-        </div>
+    <>
+      <ListPageContainer
+        toolbar={
+          <div className="flex items-center justify-between">
+            {/* 左侧按钮组 */}
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setCreateDrawerOpen(true)}
+              >
+                <IconPlus />
+                <span className="hidden lg:inline">添加</span>
+              </Button>
+            </div>
 
-        {/* 右侧搜索和刷新 */}
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <IconSearch className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="搜索菜单名称"
-              className="w-64 pl-9 h-9"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-            />
+            {/* 右侧搜索和刷新 */}
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <IconSearch className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="搜索菜单名称"
+                  className="w-64 pl-9 h-9"
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                />
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => loadMenuList()}
+              >
+                <IconRefresh className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => loadMenuList()}
-          >
-            <IconRefresh className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-
-      {/* 表格 */}
-      <div className="flex-1 min-h-0">
+        }
+        gap="md"
+        padding="md"
+      >
         <DataTable
           columns={columns}
           data={data}
@@ -423,7 +426,7 @@ export default function MenuPage() {
             onNextPage: handleNextPage,
           }}
         />
-      </div>
+      </ListPageContainer>
 
       {/* 创建菜单抽屉 */}
       <CreateMenuDrawer
@@ -432,6 +435,6 @@ export default function MenuPage() {
         onSubmit={handleCreateMenu}
         menuTypeOptions={menuTypes}
       />
-    </div>
+    </>
   )
 }

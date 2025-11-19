@@ -1,0 +1,180 @@
+/* 自定义滚动条容器 */
+.custom-scrollbar-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* 内容区域 - 隐藏原生滚动条 */
+.custom-scrollbar-content {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.custom-scrollbar-content::-webkit-scrollbar {
+  display: none;
+}
+
+/* 滚动条轨道 */
+.custom-scrollbar-track {
+  position: absolute;
+  background: transparent;
+  border-radius: 3px;
+  opacity: 0;
+  transition: opacity 0.2s ease, background 0.2s ease;
+  pointer-events: none;
+  z-index: 50; /* 高于固定列的 z-30 */
+}
+
+/* 横向滚动条 */
+.custom-scrollbar-track.horizontal {
+  bottom: 0;
+  left: 0;
+  right: 12px;
+  height: 6px;
+  transition: height 0.2s ease, opacity 0.2s ease, background 0.2s ease;
+}
+
+/* 纵向滚动条 */
+.custom-scrollbar-track.vertical {
+  top: 0;
+  right: 0;
+  bottom: 12px;
+  width: 6px;
+  transition: width 0.2s ease, opacity 0.2s ease, background 0.2s ease;
+}
+
+/* 有溢出时显示滚动条 */
+.custom-scrollbar-track.scrollbar-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* 横向滚动条激活状态 */
+.custom-scrollbar-track.horizontal.scrollbar-active {
+  height: 12px;
+}
+
+.custom-scrollbar-track.horizontal:hover {
+  height: 14px;
+}
+
+.custom-scrollbar-track.horizontal.dragging {
+  height: 14px;
+}
+
+/* 纵向滚动条激活状态 */
+.custom-scrollbar-track.vertical.scrollbar-active {
+  width: 12px;
+}
+
+.custom-scrollbar-track.vertical:hover {
+  width: 14px;
+}
+
+.custom-scrollbar-track.vertical.dragging {
+  width: 14px;
+}
+
+/* 滚动条拇指 */
+.custom-scrollbar-thumb {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+/* 横向滚动条拇指 */
+.custom-scrollbar-track.horizontal .custom-scrollbar-thumb {
+  top: 50%;
+  transform: translateY(-50%);
+  height: 4px;
+  transition: height 0.2s ease, background 0.2s ease;
+}
+
+/* 纵向滚动条拇指 */
+.custom-scrollbar-track.vertical .custom-scrollbar-thumb {
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  transition: width 0.2s ease, background 0.2s ease;
+}
+
+/* 拖动时禁用过渡 */
+.custom-scrollbar-track.dragging .custom-scrollbar-thumb {
+  transition: none;
+}
+
+/* 横向滚动条拇指激活状态 */
+.custom-scrollbar-track.horizontal.scrollbar-active .custom-scrollbar-thumb {
+  height: 6px;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.custom-scrollbar-track.horizontal:hover .custom-scrollbar-thumb,
+.custom-scrollbar-track.horizontal.dragging .custom-scrollbar-thumb {
+  height: 8px;
+  background: #888;
+  border-radius: 6px;
+}
+
+/* 纵向滚动条拇指激活状态 */
+.custom-scrollbar-track.vertical.scrollbar-active .custom-scrollbar-thumb {
+  width: 6px;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.custom-scrollbar-track.vertical:hover .custom-scrollbar-thumb,
+.custom-scrollbar-track.vertical.dragging .custom-scrollbar-thumb {
+  width: 8px;
+  background: #888;
+  border-radius: 6px;
+}
+
+.custom-scrollbar-thumb:active {
+  background: #888;
+}
+
+/* 左右侧渐变阴影 */
+.edge-shadow {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 14px;
+  pointer-events: none;
+  z-index: 40; /* 高于固定列的 z-30，但低于滚动条 */
+}
+
+.edge-shadow.left {
+  left: 0;
+  background: linear-gradient(to right, rgba(0,0,0,0.12), rgba(0,0,0,0.06), rgba(0,0,0,0));
+}
+
+.edge-shadow.right {
+  right: 0;
+  background: linear-gradient(to left, rgba(0,0,0,0.12), rgba(0,0,0,0.06), rgba(0,0,0,0));
+}
+
+.edge-shadow.top {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: auto;
+  width: auto;
+  height: 14px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.12), rgba(0,0,0,0.06), rgba(0,0,0,0));
+}
+
+.edge-shadow.bottom {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: auto;
+  width: auto;
+  height: 14px;
+  background: linear-gradient(to top, rgba(0,0,0,0.12), rgba(0,0,0,0.06), rgba(0,0,0,0));
+}
