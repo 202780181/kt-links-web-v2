@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router"
 import { Search, Settings, Bell, User, FileText, Github, Lock, LogOut, HelpCircle } from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
@@ -19,7 +19,7 @@ import { NotificationDrawer } from "@/components/notification-center"
 export function SiteHeader() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [notificationOpen, setNotificationOpen] = useState(false)
-  const { userProfile } = useAuth()
+  const { userProfile, logout } = useAuth()
   const navigate = useNavigate()
 
   // 获取用户名称的首字母作为头像
@@ -27,6 +27,41 @@ export function SiteHeader() {
     if (!name) return 'U'
     return name.charAt(0).toUpperCase()
   }
+
+  // 处理退出登录
+  const handleLogout = async () => {
+    try {
+      await logout()
+      navigate('/login')
+    } catch (error) {
+      console.error('退出登录失败:', error)
+    }
+  }
+
+  // 处理锁定屏幕
+  const handleLockScreen = () => {
+    // TODO: 实现锁定屏幕功能
+    console.log('锁定屏幕')
+  }
+
+  // 键盘快捷键监听
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl + L: 锁定屏幕
+      if (e.ctrlKey && e.key === 'l') {
+        e.preventDefault()
+        handleLockScreen()
+      }
+      // Ctrl + Q: 退出登录
+      if (e.ctrlKey && e.key === 'q') {
+        e.preventDefault()
+        handleLogout()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
@@ -64,7 +99,7 @@ export function SiteHeader() {
             className="h-10 w-10 relative"
             onClick={() => setNotificationOpen(true)}
           >
-            <Bell className="h-5 w-5" />
+            <Bell className="size-4.5 !w-4.5 !h-4.5" />
             <Badge 
               className="absolute top-0 right-0 h-5 w-5 rounded-full p-0 flex items-center justify-center text-[10px] bg-blue-500 text-white hover:bg-blue-600"
             >
@@ -78,7 +113,7 @@ export function SiteHeader() {
             className="h-10 w-10"
             onClick={() => setSettingsOpen(true)}
           >
-            <Settings className="h-5 w-5" />
+            <Settings className="size-4.5 !w-4.5 !h-4.5" />
           </Button>
         </div>
 
@@ -88,7 +123,7 @@ export function SiteHeader() {
             <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full focus-visible:ring-0 focus-visible:ring-offset-0">
               <Avatar className="h-8 w-8">
                 <AvatarImage src="" alt={userProfile?.name || 'User'} />
-                <AvatarFallback className="bg-primary text-primary-foreground">
+                <AvatarFallback className="bg-gradient-to-br from-pink-400 to-orange-400 text-white">
                   {getInitials(userProfile?.name)}
                 </AvatarFallback>
               </Avatar>
@@ -144,13 +179,13 @@ export function SiteHeader() {
             
             <DropdownMenuSeparator />
             
-            <DropdownMenuItem className="gap-2 py-2">
+            <DropdownMenuItem className="gap-2 py-2" onClick={handleLockScreen}>
               <Lock className="h-4 w-4" />
               <span>锁定屏幕</span>
               <span className="ml-auto text-xs text-muted-foreground">⌃ L</span>
             </DropdownMenuItem>
             
-            <DropdownMenuItem className="gap-2 py-2">
+            <DropdownMenuItem className="gap-2 py-2" onClick={handleLogout}>
               <LogOut className="h-4 w-4" />
               <span>退出登录</span>
               <span className="ml-auto text-xs text-muted-foreground">⌃ Q</span>
