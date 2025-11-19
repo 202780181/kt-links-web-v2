@@ -110,9 +110,9 @@ export function DataTable<TData, TValue>({
   })
 
   return (
-    <div className="flex flex-col gap-4 h-full">
+    <div className={`flex flex-col gap-4 ${showPagination ? 'h-full' : ''}`}>
       {/* 表格容器 */}
-      <div className="flex-1 min-h-0 rounded-lg border overflow-auto data-table-scroll">
+      <div className={`rounded-lg border ${showPagination ? 'flex-1 min-h-0 overflow-auto data-table-scroll' : ''}`}>
         <table className="w-full caption-bottom text-sm table-fixed">
           <thead className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
             {table.getHeaderGroups().map((headerGroup) => (

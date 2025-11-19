@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 import { getMenuById, getMenuPageList, type MenuItem } from '@/api/menu'
 import { getMenuTypeList, type SystemTypeOption } from '@/api/systemTypes'
 import { formatTimestamp } from '@/utils'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -62,6 +62,23 @@ interface BreadcrumbItem {
   id: string
   name: string
 }
+
+// 公共加载组件
+const LoadingState = ({ message = '加载中...' }: { message?: string }) => (
+  <div className="flex items-center justify-center h-32">
+    <div className="flex items-center gap-2 text-muted-foreground">
+      <Loader2 className="h-5 w-5 animate-spin" />
+      <span>{message}</span>
+    </div>
+  </div>
+)
+
+// 公共空状态组件
+const EmptyState = ({ message }: { message: string }) => (
+  <div className="flex items-center justify-center h-32 text-muted-foreground">
+    {message}
+  </div>
+)
 
 const MenuDetailPage = () => {
   const { id } = useParams<{ id: string }>()
@@ -370,7 +387,7 @@ const MenuDetailPage = () => {
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground w-20">菜单类型</span>
             <Badge variant="outline">
-              {menuTypes.find((t) => Number(t.value) === menuDetail.menuType)?.label || '-'}
+              {menuTypes.find((t) => t.value === menuDetail.menuCode)?.label || '-'}
             </Badge>
           </div>
           <div className="flex items-center gap-4">
@@ -398,7 +415,6 @@ const MenuDetailPage = () => {
           <Card>
             <CardHeader>
               <CardTitle>菜单信息</CardTitle>
-              <CardDescription>查看菜单的详细配置信息</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-x-8 gap-y-6">
@@ -540,24 +556,13 @@ const MenuDetailPage = () => {
 
         {/* 子菜单 Tab */}
         <TabsContent value="submenu" className="space-y-4">
-          <Card>
-            <CardContent>
-              {subMenusLoading ? (
-                <div className="flex items-center justify-center h-32">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    <span>加载中...</span>
-                  </div>
-                </div>
-              ) : subMenus.length > 0 ? (
-                <DataTable columns={subMenuColumns} data={subMenus} />
-              ) : (
-                <div className="flex items-center justify-center h-32 text-muted-foreground">
-                  暂无子菜单
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          {subMenusLoading ? (
+            <LoadingState />
+          ) : subMenus.length > 0 ? (
+            <DataTable columns={subMenuColumns} data={subMenus} showPagination={false} />
+          ) : (
+            <EmptyState message="暂无子菜单" />
+          )}
         </TabsContent>
       </Tabs>
     </div>
