@@ -70,7 +70,6 @@ const MenuDetailPage = () => {
   const [menuDetail, setMenuDetail] = useState<MenuDetailData | null>(null)
   const [subMenus, setSubMenus] = useState<SubMenuData[]>([])
   const [subMenusLoading, setSubMenusLoading] = useState(false)
-  const [subMenusLoaded, setSubMenusLoaded] = useState(false)
   const [menuTypes, setMenuTypes] = useState<SystemTypeOption[]>([])
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([])
 
@@ -164,7 +163,6 @@ const MenuDetailPage = () => {
           createTs: item.createTs,
         }))
         setSubMenus(subData)
-        setSubMenusLoaded(true)
       }
     } catch (error) {
       console.error('加载子菜单失败:', error)

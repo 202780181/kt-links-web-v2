@@ -129,7 +129,8 @@ class ClientAuthService {
    */
   private static encryptAESGCM(data: string, key: Uint8Array): string {
     // 使用 node-forge 实现真正的 AES-GCM 加密
-    const cipher = forge.cipher.createCipher('AES-GCM', forge.util.createBuffer(key))
+    const keyBinary = forge.util.binary.raw.encode(key)
+    const cipher = forge.cipher.createCipher('AES-GCM', forge.util.createBuffer(keyBinary))
     const iv = forge.random.getBytesSync(12) // 96-bit IV for GCM
     
     cipher.start({
@@ -250,7 +251,8 @@ class ClientAuthService {
     )
 
     // 加密签名
-    const signatureBase64 = forge.util.encode64(forge.util.createBuffer(signature).getBytes())
+    const signatureBinary = forge.util.binary.raw.encode(signature)
+    const signatureBase64 = forge.util.encode64(forge.util.createBuffer(signatureBinary).getBytes())
     const encryptedSign = this.encryptAESGCM(
       signatureBase64,
       signEncryptKey
@@ -342,7 +344,8 @@ class ClientAuthService {
     
     // 9.2 使用客户端签名私钥对数据签名
     const authSignature = this.signEd25519(needSignDataForAuth, fullPrivateKey)
-    const authSignatureBase64 = forge.util.encode64(forge.util.createBuffer(authSignature).getBytes())
+    const authSignatureBinary = forge.util.binary.raw.encode(authSignature)
+    const authSignatureBase64 = forge.util.encode64(forge.util.createBuffer(authSignatureBinary).getBytes())
     
     // 9.3 请求客户端认证接口
     const authRequestData = {
