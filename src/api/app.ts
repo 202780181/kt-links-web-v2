@@ -36,6 +36,7 @@ export interface AppPageResponse {
 	nextCursor?: string;
 	prevCursor?: string;
 	cursorType?: string;
+	cursorCreateTs?: string;
 }
 
 /**

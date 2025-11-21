@@ -17,6 +17,7 @@ import {
 const HomePage = lazy(() => import('@/pages/home'))
 const MenuListPage = lazy(() => import('@/pages/menu'))
 const MenuDetailPage = lazy(() => import('@/pages/menu/detail'))
+const ApplicationPage = lazy(() => import('@/pages/application'))
 const PermissionsPage = lazy(() => import('@/pages/permissions'))
 const AccountInfoPage = lazy(() => import('@/pages/account/InfoPage'))
 const AccountVerificationPage = lazy(() => import('@/pages/account/VerificationPage'))
@@ -65,8 +66,8 @@ export const routesConfig: RouteConfig[] = [
     showInSidebar: true,
   },
   {
-    path: '/apps',
-    component: HomePage, // 暂时使用 HomePage，后续替换
+    path: '/application',
+    component: ApplicationPage,
     title: '应用',
     icon: AppWindow,
     showInSidebar: true,
