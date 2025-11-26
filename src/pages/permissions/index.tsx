@@ -20,10 +20,11 @@ import { Input } from '@/components/ui/input'
 import { DataTable } from '@/components/table'
 import { DeleteConfirmButton } from '@/components/ui/delete-confirm'
 import { ListPageContainer } from '@/components/list-page-warpper'
+import { CreatePermissionDrawer } from './create-permission-drawer'
 
 // 定义表格列
 const createColumns = (
-  onEdit: (id: string) => void,
+  onEdit: (item: AuthCodeItem) => void,
   onDelete: (id: string) => void
 ): ColumnDef<AuthCodeItem>[] => [
   {
@@ -154,7 +155,7 @@ const createColumns = (
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => onEdit(row.original.id)}
+          onClick={() => onEdit(row.original)}
         >
           编辑
         </Button>
@@ -184,6 +185,8 @@ const PermissionsPage = () => {
   const [hasPrevious, setHasPrevious] = useState(false)
   const [nextCursor, setNextCursor] = useState('')
   const [prevCursor, setPrevCursor] = useState('')
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [editingItem, setEditingItem] = useState<AuthCodeItem | null>(null)
 
   // 加载权限码列表
   const loadAuthCodes = useCallback(async (
@@ -232,11 +235,16 @@ const PermissionsPage = () => {
     loadAuthCodes()
   }
 
+  // 处理添加
+  const handleAdd = () => {
+    setEditingItem(null)
+    setDrawerOpen(true)
+  }
+
   // 处理编辑
-  const handleEdit = (id: string) => {
-    // TODO: 打开编辑抽屉
-    console.log('编辑权限码:', id)
-    toast.info('编辑功能开发中')
+  const handleEdit = (item: AuthCodeItem) => {
+    setEditingItem(item)
+    setDrawerOpen(true)
   }
 
   // 处理删除
@@ -276,13 +284,19 @@ const PermissionsPage = () => {
     setPageSize(newSize)
   }
 
+  // 处理抽屉提交
+  const handleDrawerSubmit = () => {
+    loadAuthCodes()
+  }
+
   const columns = createColumns(handleEdit, handleDelete)
 
   return (
+    <>
     <ListPageContainer
       toolbar={
         <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline">
+          <Button size="sm" variant="outline" onClick={handleAdd}>
             <IconPlus className="h-4 w-4"/>
             <span className="hidden lg:inline">添加</span>
           </Button>
@@ -324,6 +338,15 @@ const PermissionsPage = () => {
         }}
       />
     </ListPageContainer>
+
+    {/* 新增/编辑权限码抽屉 */}
+    <CreatePermissionDrawer
+      open={drawerOpen}
+      onOpenChange={setDrawerOpen}
+      onSubmit={handleDrawerSubmit}
+      editData={editingItem}
+    />
+    </>
   )
 }
 

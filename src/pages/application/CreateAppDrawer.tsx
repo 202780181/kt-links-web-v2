@@ -34,6 +34,7 @@ import {
 } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { ImageUpload } from '@/components/ui/image-upload'
 
 // 表单验证 Schema
 const appFormSchema = z.object({
@@ -162,13 +163,13 @@ export function CreateAppDrawer({
 
         <div className="flex-1 overflow-y-auto">
           <Form {...form}>
-            <form id="app-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pb-20">
+            <form id="app-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pr-5">
                 <FormField
                   control={form.control}
                   name="appName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>应用名称 *</FormLabel>
+                      <FormLabel>应用名称</FormLabel>
                       <FormControl>
                         <Input placeholder="请输入应用名称" {...field} />
                       </FormControl>
@@ -182,7 +183,7 @@ export function CreateAppDrawer({
                   name="appCode"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>应用编码 *</FormLabel>
+                      <FormLabel>应用编码</FormLabel>
                       <FormControl>
                         <Input placeholder="例如: sys-app" {...field} />
                       </FormControl>
@@ -196,13 +197,13 @@ export function CreateAppDrawer({
                   name="appStatus"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>应用状态 *</FormLabel>
+                      <FormLabel>应用状态</FormLabel>
                       <Select
                         onValueChange={(value) => field.onChange(Number(value))}
                         value={String(field.value)}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="w-full">
                             <SelectValue placeholder="请选择应用状态" />
                           </SelectTrigger>
                         </FormControl>
@@ -223,7 +224,10 @@ export function CreateAppDrawer({
                     <FormItem>
                       <FormLabel>应用图标</FormLabel>
                       <FormControl>
-                        <Input placeholder="请输入图标URL" {...field} />
+                        <ImageUpload
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

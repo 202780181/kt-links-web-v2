@@ -151,7 +151,7 @@ export function FormFieldWrapper<TFieldValues extends FieldValues = FieldValues>
         return (
           <Select
             onValueChange={field.onChange}
-            defaultValue={field.value}
+            value={field.value || undefined}
             disabled={disabled}
           >
             <FormControl>
@@ -198,7 +198,7 @@ export function FormFieldWrapper<TFieldValues extends FieldValues = FieldValues>
         name={name}
         render={({ field }) => (
           <FormItem className={`flex items-center gap-3 ${className || ''}`}>
-            <FormLabel className={`${finalLabelWidth} ${alignClass} shrink-0 ${labelClassName || ''}`}>
+            <FormLabel className={`mb-0 ${finalLabelWidth} ${alignClass} shrink-0 ${labelClassName || ''}`}>
               {label}
             </FormLabel>
             <div className="flex-1">
@@ -218,7 +218,7 @@ export function FormFieldWrapper<TFieldValues extends FieldValues = FieldValues>
       name={name}
       render={({ field }) => (
         <FormItem className={className}>
-          <FormLabel className={labelClassName}>{label}</FormLabel>
+          <FormLabel className={`block mb-2.5 ${labelClassName || ''}`}>{label}</FormLabel>
           <FormControl>{renderInput(field)}</FormControl>
           <FormMessage />
         </FormItem>
