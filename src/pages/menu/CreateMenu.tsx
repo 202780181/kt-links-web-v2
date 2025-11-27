@@ -16,7 +16,7 @@ import { FormFields, FormFieldWrapper, FormConfigProvider } from '@/components/f
 import { addMenu, type MenuItem } from '@/api/menu'
 import { type SystemTypeOption } from '@/api/systemTypes'
 import { toast } from 'sonner'
-import { ParentMenuSelector } from './parent-menu-selector'
+import { ParentMenuSelector } from './ParentMenu'
 
 interface CreateMenuDrawerProps {
   open: boolean

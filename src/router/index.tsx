@@ -35,9 +35,37 @@ const convertToRouterConfig = (config: RouteConfig) => {
     route.index = true
   }
   
-  // 如果有子路由
-  if (config.children) {
-    route.children = config.children.map(convertToRouterConfig)
+  // 如果有子路由，需要特殊处理
+  if (config.children && config.children.length > 0) {
+    route.children = config.children.map(child => {
+      const Component = child.component
+      const childRoute: any = {
+        path: child.path,
+        element: (
+          <LazyWrapper>
+            <Component />
+          </LazyWrapper>
+        ),
+      }
+      
+      // 注意：如果既有 path 又有 index，保留 path，不设置 index
+      // 因为在 React Router 中，index 路由不能有 path
+      
+      return childRoute
+    })
+    
+    // 如果有索引路由，添加一个索引路由重定向到第一个子路由
+    const indexChild = config.children.find(child => child.index)
+    if (indexChild && indexChild.path) {
+      route.children.unshift({
+        index: true,
+        element: (
+          <LazyWrapper>
+            <indexChild.component />
+          </LazyWrapper>
+        ),
+      })
+    }
   }
   
   return route

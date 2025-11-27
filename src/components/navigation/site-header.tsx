@@ -67,13 +67,16 @@ export function SiteHeader() {
     <>
     <header className="flex h-14 shrink-0 items-center gap-4 border-b bg-background px-4">
       {/* Logo 和标题 */}
-      <div className="flex items-center gap-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded bg-primary">
-          <svg viewBox="0 0 24 24" className="h-5 w-5 text-primary-foreground" fill="currentColor">
-            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" />
-          </svg>
+      <div className="flex items-center">
+        <div className="flex h-10 w-10 items-center justify-center rounded">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cloud Icon">
+              <g transform="translate(12,12) scale(1.15) translate(-12,-12)">
+                <path d="M7 17H17.2C19.299 17 21 15.299 21 13.2C21 11.249 19.538 9.653 17.64 9.43C16.983 6.952 14.79 5 12.1 5C9.6 5 7.51 6.705 6.9 9.047C5.277 9.32 4 10.733 4 12.4C4 14.389 5.611 16 7.6 16H7Z" stroke="#0052d9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+                  </path>
+              </g>
+            </svg>
         </div>
-        <span className="text-sm font-medium">控制台</span>
+          <span className="text-[24px] font-semibold select-none text-[#0052d9]">ktlinks</span>
       </div>
 
       {/* 搜索框 */}

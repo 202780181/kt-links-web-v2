@@ -22,7 +22,7 @@ import {
   type AddAuthCodeParams,
   type UpdateAuthCodeParams,
   type AuthCodeTypeOption,
-} from '@/api/authCode'
+} from '@/api/permissions'
 import { toast } from 'sonner'
 
 interface CreatePermissionDrawerProps {
@@ -220,7 +220,7 @@ export function CreatePermissionDrawer({
 
         <div className="flex-1 overflow-y-auto">
           <Form {...form}>
-            <FormConfigProvider labelAlign="right" labelWidth="w-[110px]">
+            <FormConfigProvider labelAlign="right" labelWidth="w-[90px]">
               <form id="permission-form" onSubmit={form.handleSubmit(onFormSubmit)} className="space-y-6 pr-5">
                 {/* 第一行：权限码名称和状态 */}
                 <FormFields

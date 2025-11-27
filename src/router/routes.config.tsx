@@ -19,6 +19,7 @@ const MenuListPage = lazy(() => import('@/pages/menu'))
 const MenuDetailPage = lazy(() => import('@/pages/menu/detail'))
 const ApplicationPage = lazy(() => import('@/pages/application'))
 const PermissionsPage = lazy(() => import('@/pages/permissions'))
+const UserPage = lazy(() => import('@/pages/user'))
 const AccountInfoPage = lazy(() => import('@/pages/account/InfoPage'))
 const AccountVerificationPage = lazy(() => import('@/pages/account/VerificationPage'))
 const AccountSecurityPage = lazy(() => import('@/pages/account/SecurityPage'))
@@ -60,7 +61,7 @@ export const routesConfig: RouteConfig[] = [
   },
   {
     path: '/users',
-    component: HomePage, // 暂时使用 HomePage，后续替换
+    component: UserPage,
     title: '用户',
     icon: Users,
     showInSidebar: true,
@@ -96,7 +97,7 @@ export const developerRoutesConfig: RouteConfig[] = [
     showInSidebar: false,
     children: [
       {
-        path: '/developer/info',
+        path: 'info',
         component: AccountInfoPage,
         title: '账号信息',
         icon: User,
@@ -104,21 +105,21 @@ export const developerRoutesConfig: RouteConfig[] = [
         index: true, // 默认子路由
       },
       {
-        path: '/developer/auth',
+        path: 'auth',
         component: AccountVerificationPage,
         title: '实名认证',
         icon: Shield,
         showInSidebar: true,
       },
       {
-        path: '/developer/security',
+        path: 'security',
         component: AccountSecurityPage,
         title: '安全设置',
         icon: Settings,
         showInSidebar: true,
       },
       {
-        path: '/developer/access',
+        path: 'access',
         component: AccountAccessPage,
         title: '访问管理',
         icon: Lock,
@@ -148,7 +149,7 @@ export const generateDeveloperSidebarItems = () => {
     .filter((route) => route.showInSidebar && route.title && route.icon)
     .map((route) => ({
       title: route.title!,
-      url: route.path,
+      url: `${developerRoute.path}/${route.path}`,
       icon: route.icon!,
     }))
 }

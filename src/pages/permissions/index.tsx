@@ -1,31 +1,75 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
 import { type ColumnDef } from '@tanstack/react-table'
 import {
   IconPlus,
   IconRefresh,
-  IconSearch
+  IconSearch,
+  IconLoader2
 } from '@tabler/icons-react'
-import { toast } from 'sonner'
+import useSWR from 'swr'
 
+import { toast } from 'sonner'
+import useSWRMutation from 'swr/mutation'
 import {
-  getAuthCodePageList,
-  deleteAuthCodes,
+  fetchAuthCodePageList,
+  fetchDeleteAuthCode,
   type AuthCodeItem,
-} from '@/api/authCode'
+  type AuthCodePageParams,
+} from '@/api/permissions'
 import { formatTimestamp } from '@/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { DataTable } from '@/components/table'
-import { DeleteConfirmButton } from '@/components/ui/delete-confirm'
 import { ListPageContainer } from '@/components/list-page-warpper'
-import { CreatePermissionDrawer } from './create-permission-drawer'
+import { DeleteConfirmButton } from '@/components/ui/delete-confirm'
+import { CreatePermissionDrawer } from './CreatePermission'
+
+// 删除操作组件
+const DeleteAction = ({ id, onDeleted }: { id: string, onDeleted: () => void }) => {
+  const { trigger, isMutating } = useSWRMutation('/api/auth/a-code/delete', fetchDeleteAuthCode)
+
+  const handleDelete = async () => {
+    try {
+      await trigger([id])
+      toast.success('删除成功')
+      onDeleted()
+    } catch (error) {
+      console.error('删除失败:', error)
+      toast.error('删除失败')
+    }
+  }
+
+  return (
+    <DeleteConfirmButton
+      title="删除权限码"
+      description="确定要删除这个权限码吗？此操作无法撤销。"
+      onConfirm={handleDelete}
+    >
+      <Button 
+        variant="ghost" 
+        size="sm" 
+        className="text-destructive hover:text-destructive"
+        disabled={isMutating}
+      >
+        {isMutating ? (
+          <>
+            <IconLoader2 className="h-4 w-4 mr-1 animate-spin" />
+            删除中...
+          </>
+        ) : (
+          '删除'
+        )}
+      </Button>
+    </DeleteConfirmButton>
+  )
+}
 
 // 定义表格列
 const createColumns = (
   onEdit: (item: AuthCodeItem) => void,
-  onDelete: (id: string) => void
+  onDeleted: () => void
 ): ColumnDef<AuthCodeItem>[] => [
   {
     id: 'select',
@@ -159,15 +203,7 @@ const createColumns = (
         >
           编辑
         </Button>
-        <DeleteConfirmButton
-          title="删除权限码"
-          description="确定要删除这个权限码吗？此操作无法撤销。"
-          onConfirm={() => onDelete(row.original.id)}
-        >
-          <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
-            删除
-          </Button>
-        </DeleteConfirmButton>
+        <DeleteAction id={row.original.id} onDeleted={onDeleted} />
       </div>
     ),
     meta: {
@@ -177,62 +213,53 @@ const createColumns = (
 ]
 
 const PermissionsPage = () => {
-  const [data, setData] = useState<AuthCodeItem[]>([])
-  const [loading, setLoading] = useState(false)
   const [searchName, setSearchName] = useState('')
   const [pageSize, setPageSize] = useState(50)
-  const [hasNext, setHasNext] = useState(false)
-  const [hasPrevious, setHasPrevious] = useState(false)
-  const [nextCursor, setNextCursor] = useState('')
-  const [prevCursor, setPrevCursor] = useState('')
+  const [cursorId, setCursorId] = useState<string | undefined>()
+  const [cursorCreateTs, setCursorCreateTs] = useState<string | undefined>()
+  const [cursorType, setCursorType] = useState<string | undefined>()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<AuthCodeItem | null>(null)
 
-  // 加载权限码列表
-  const loadAuthCodes = useCallback(async (
-    cursorId?: string,
-    cursorCreateTs?: string,
-    cursorType?: string
-  ) => {
-    setLoading(true)
-    try {
-      const response = await getAuthCodePageList({
-        size: pageSize,
-        cursorId,
-        cursorCreateTs,
-        cursorType,
-        name_like: searchName || undefined,
-      })
+  // 构建请求参数
+  const params: AuthCodePageParams = {
+    size: pageSize,
+    cursorId,
+    cursorCreateTs,
+    cursorType,
+    name_like: searchName || undefined,
+  }
 
-      if (response.code === 0 && response.data) {
-        setData(response.data.data)
-        setHasNext(response.data.hasNext)
-        setHasPrevious(response.data.hasPrevious)
-        setNextCursor(response.data.nextCursor)
-        setPrevCursor(response.data.prevCursor)
-      }
-    } catch (error) {
-      console.error('加载权限码列表失败:', error)
-      toast.error('加载权限码列表失败')
-    } finally {
-      setLoading(false)
+  // 使用 SWR (Dify Pattern)
+  const { data: response, isLoading, isValidating, mutate } = useSWR(
+    params,
+    fetchAuthCodePageList,
+    {
+      revalidateOnFocus: false,
     }
-  }, [pageSize, searchName])
+  )
 
-  // 初始加载
-  useEffect(() => {
-    loadAuthCodes()
-  }, [loadAuthCodes])
+  const data = response?.data?.data || []
+  const hasNext = response?.data?.hasNext || false
+  const hasPrevious = response?.data?.hasPrevious || false
+  const nextCursor = response?.data?.nextCursor || ''
+  const prevCursor = response?.data?.prevCursor || ''
 
   // 处理搜索
   const handleSearch = () => {
-    loadAuthCodes()
+    setCursorId(undefined)
+    setCursorCreateTs(undefined)
+    setCursorType(undefined)
+    mutate()
   }
 
   // 处理刷新
   const handleRefresh = () => {
     setSearchName('')
-    loadAuthCodes()
+    setCursorId(undefined)
+    setCursorCreateTs(undefined)
+    setCursorType(undefined)
+    mutate()
   }
 
   // 处理添加
@@ -247,35 +274,23 @@ const PermissionsPage = () => {
     setDrawerOpen(true)
   }
 
-  // 处理删除
-  const handleDelete = async (id: string) => {
-    try {
-      const response = await deleteAuthCodes([id])
-      if (response.code === 0) {
-        toast.success('删除成功')
-        loadAuthCodes()
-      } else {
-        toast.error(response.message || '删除失败')
-      }
-    } catch (error) {
-      console.error('删除权限码失败:', error)
-      toast.error('删除权限码失败')
-    }
-  }
-
   // 处理上一页
   const handlePrevPage = () => {
     if (hasPrevious && prevCursor) {
-      const [cursorId, cursorCreateTs] = prevCursor.split('_')
-      loadAuthCodes(cursorId, cursorCreateTs, 'up')
+      const [id, createTs] = prevCursor.split('_')
+      setCursorId(id)
+      setCursorCreateTs(createTs)
+      setCursorType('up')
     }
   }
 
   // 处理下一页
   const handleNextPage = () => {
     if (hasNext && nextCursor) {
-      const [cursorId, cursorCreateTs] = nextCursor.split('_')
-      loadAuthCodes(cursorId, cursorCreateTs, 'down')
+      const [id, createTs] = nextCursor.split('_')
+      setCursorId(id)
+      setCursorCreateTs(createTs)
+      setCursorType('down')
     }
   }
 
@@ -286,10 +301,10 @@ const PermissionsPage = () => {
 
   // 处理抽屉提交
   const handleDrawerSubmit = () => {
-    loadAuthCodes()
+    mutate()
   }
 
-  const columns = createColumns(handleEdit, handleDelete)
+  const columns = createColumns(handleEdit, () => mutate())
 
   return (
     <>
@@ -315,8 +330,12 @@ const PermissionsPage = () => {
                 className="pl-9"
               />
             </div>
-            <Button variant="ghost" size="icon" onClick={handleRefresh}>
-              <IconRefresh className="h-4 w-4" />
+            <Button variant="ghost" size="icon" onClick={handleRefresh} disabled={isLoading || isValidating}>
+              {isValidating ? (
+                <IconLoader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <IconRefresh className="h-4 w-4" />
+              )}
             </Button>
           </div>
         </div>
@@ -325,7 +344,7 @@ const PermissionsPage = () => {
       <DataTable
         columns={columns}
         data={data}
-        loading={loading}
+        loading={isLoading || isValidating}
         showPagination={true}
         pageSizeOptions={[10, 20, 50, 100, 200]}
         pagination={{

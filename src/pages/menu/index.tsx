@@ -21,7 +21,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { DataTable } from '@/components/table'
 import { DeleteConfirmButton } from '@/components/ui/delete-confirm'
-import { CreateMenuDrawer } from './create-menu'
+import { CreateMenuDrawer } from './CreateMenu'
 import { ListPageContainer } from '@/components/layout'
 
 // 菜单数据接口

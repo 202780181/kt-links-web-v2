@@ -8,7 +8,7 @@ import {
   addApp,
   updateApp,
   type AppItem,
-} from '@/api/app'
+} from '@/api/application'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -120,7 +120,10 @@ export function CreateAppDrawer({
 
       if (isEdit && editingApp) {
         // 更新应用
-        const response = await updateApp(editingApp.id, params)
+        const response = await updateApp({
+          id: editingApp.id,
+          ...params,
+        })
         if (response.code === 0) {
           toast.success('应用更新成功')
           onSuccess()
