@@ -102,7 +102,7 @@ export function SiteHeader() {
             className="h-10 w-10 relative"
             onClick={() => setNotificationOpen(true)}
           >
-            <Bell className="size-4.5 !w-4.5 !h-4.5" />
+            <Bell className="size-4.5 w-4.5! h-4.5!" />
             <Badge 
               className="absolute top-0 right-0 h-5 w-5 rounded-full p-0 flex items-center justify-center text-[10px] bg-blue-500 text-white hover:bg-blue-600"
             >
@@ -116,7 +116,7 @@ export function SiteHeader() {
             className="h-10 w-10"
             onClick={() => setSettingsOpen(true)}
           >
-            <Settings className="size-4.5 !w-4.5 !h-4.5" />
+            <Settings className="size-4.5 w-4.5! h-4.5!" />
           </Button>
         </div>
 
@@ -126,7 +126,7 @@ export function SiteHeader() {
             <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full focus-visible:ring-0 focus-visible:ring-offset-0">
               <Avatar className="h-8 w-8">
                 <AvatarImage src="" alt={userProfile?.name || 'User'} />
-                <AvatarFallback className="bg-gradient-to-br from-pink-400 to-orange-400 text-white">
+                <AvatarFallback className="bg-linear-to-br from-pink-400 to-orange-400 text-white">
                   {getInitials(userProfile?.name)}
                 </AvatarFallback>
               </Avatar>
@@ -138,7 +138,7 @@ export function SiteHeader() {
               <div className="relative">
                 <Avatar className="h-12 w-12">
                   <AvatarImage src="" alt={userProfile?.name || 'User'} />
-                  <AvatarFallback className="bg-gradient-to-br from-pink-400 to-orange-400 text-white text-lg">
+                  <AvatarFallback className="bg-linear-to-br from-pink-400 to-orange-400 text-white text-lg">
                     {getInitials(userProfile?.name)}
                   </AvatarFallback>
                 </Avatar>

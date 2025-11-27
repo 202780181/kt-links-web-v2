@@ -105,13 +105,13 @@ export const ListPageContainer = ({
       <div ref={containerRef} className={`flex-1 min-h-0 flex flex-col ${gapMap[gap]}`}>
         {/* 顶部工具栏区域 - 自然高度 */}
         {toolbar && (
-          <div ref={toolbarRef} className="flex-shrink-0">
+          <div ref={toolbarRef} className="shrink-0">
             {toolbar}
           </div>
         )}
 
         {/* 表格区域 - 传递计算好的高度 */}
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           {childrenWithHeight}
         </div>
       </div>
