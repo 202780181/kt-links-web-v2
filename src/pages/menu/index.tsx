@@ -303,8 +303,7 @@ export default function MenuPage() {
 
   // 查看菜单
   const handleView = (id: string) => {
-    toast.error(`查看菜单: ${id}`)
-    // TODO: 实现查看逻辑
+    navigate(`/menu/${id}`)
   }
 
   // 删除菜单

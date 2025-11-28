@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -48,6 +48,8 @@ export function ParentMenuSelector({
   const [menuList, setMenuList] = useState<MenuItem[]>([])
   const [loading, setLoading] = useState(false)
   const [selectedMenuId, setSelectedMenuId] = useState<string | null>(null)
+  const [tableHeight, setTableHeight] = useState<number>(400)
+  const tableContainerRef = useRef<HTMLDivElement>(null)
 
   // 加载菜单列表
   useEffect(() => {
@@ -79,6 +81,31 @@ export function ParentMenuSelector({
 
     loadMenuList()
   }, [open, allowedMenuType, currentMenuType])
+
+  // 计算表格容器高度
+  useEffect(() => {
+    if (open) {
+      const updateHeight = () => {
+        if (tableContainerRef.current) {
+          const height = tableContainerRef.current.offsetHeight
+          if (height > 0) {
+            setTableHeight(height - 10) // 减去一些padding
+          }
+        }
+      }
+      
+      // 延迟执行以确保DOM已渲染
+      const timer = setTimeout(updateHeight, 200)
+      
+      // 监听窗口大小变化
+      window.addEventListener('resize', updateHeight)
+      
+      return () => {
+        clearTimeout(timer)
+        window.removeEventListener('resize', updateHeight)
+      }
+    }
+  }, [open])
 
   // 处理单选框变化
   const handleRadioChange = (menuId: string) => {
@@ -154,30 +181,50 @@ export function ParentMenuSelector({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-[900px] sm:max-w-[900px] flex flex-col">
+      <SheetContent className="w-[900px] sm:max-w-[900px] flex flex-col pr-4">
         <SheetHeader className="pb-6">
           <SheetTitle>选择父级菜单</SheetTitle>
           <SheetDescription>从列表中选择一个菜单作为父级菜单</SheetDescription>
         </SheetHeader>
 
-        <div className="flex-1 overflow-y-auto">
+        <div ref={tableContainerRef} className="flex-1">
           <DataTable
             columns={columns}
             data={menuList}
             loading={loading}
+            tableHeight={tableHeight}
+            enableRowClick={true}
+            onRowSelectionChange={(selectedRows) => {
+              if (selectedRows.length > 0) {
+                setSelectedMenuId(selectedRows[0].id)
+              } else {
+                setSelectedMenuId(null)
+              }
+            }}
           />
         </div>
 
-        <div className="sticky bottom-0 bg-background border-t p-4 flex justify-end gap-3">
-          <Button variant="outline" onClick={handleClear}>
+        <div className="flex justify-between pt-3 border-t pb-3 shrink-0">
+          <Button 
+            variant="outline" 
+            onClick={handleClear}
+          >
             清空选择
           </Button>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            取消
-          </Button>
-          <Button onClick={handleConfirm} disabled={!selectedMenuId}>
-            确认选择
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => onOpenChange(false)}
+            >
+              取消
+            </Button>
+            <Button 
+              onClick={handleConfirm}
+              disabled={!selectedMenuId}
+            >
+              确认选择
+            </Button>
+          </div>
         </div>
       </SheetContent>
     </Sheet>

@@ -417,7 +417,7 @@ const MenuDetailPage = () => {
               <CardTitle>菜单信息</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-x-8 gap-y-6">
+              <div className="grid grid-cols-2 gap-x-8 gap-y-3">
                 {/* 菜单名称 */}
                 <div className="flex items-center py-2">
                   <label className="text-sm font-medium text-muted-foreground w-24 shrink-0">
