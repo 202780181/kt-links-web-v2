@@ -238,7 +238,7 @@ const ParentOrgSelector = ({
               取消
             </Button>
             <Button onClick={handleConfirm} disabled={!selectedOrgId}>
-              确认选择
+              确认
             </Button>
           </div>
         </SheetContent>

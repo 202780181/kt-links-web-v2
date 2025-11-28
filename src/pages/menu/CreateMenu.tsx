@@ -14,9 +14,11 @@ import {
 } from '@/components/ui/sheet'
 import { FormFields, FormFieldWrapper, FormConfigProvider } from '@/components/form/FormFieldWrapper'
 import { addMenu, type MenuItem } from '@/api/menu'
+import { type AppItem } from '@/api/application'
 import { type SystemTypeOption } from '@/api/systemTypes'
 import { toast } from 'sonner'
 import { ParentMenuSelector } from './ParentMenu'
+import { AppSelector } from './AppSelector'
 
 interface CreateMenuDrawerProps {
   open: boolean
@@ -48,6 +50,8 @@ export function CreateMenuDrawer({ open, onOpenChange, onSubmit, menuTypeOptions
   const [submitting, setSubmitting] = useState(false)
   const [parentMenuDialogOpen, setParentMenuDialogOpen] = useState(false)
   const [selectedParentMenu, setSelectedParentMenu] = useState<MenuItem | null>(null)
+  const [appSelectorOpen, setAppSelectorOpen] = useState(false)
+  const [selectedApp, setSelectedApp] = useState<AppItem | null>(null)
 
   const form = useForm<MenuFormData>({
     resolver: zodResolver(menuFormSchema),
@@ -84,6 +88,17 @@ export function CreateMenuDrawer({ open, onOpenChange, onSubmit, menuTypeOptions
   const handleSelectParentMenu = (menu: MenuItem | null) => {
     setSelectedParentMenu(menu)
     form.setValue('parentMenu', menu?.id || '')
+  }
+
+  // 打开应用选择对话框
+  const handleOpenAppSelector = () => {
+    setAppSelectorOpen(true)
+  }
+
+  // 选择应用
+  const handleSelectApp = (app: AppItem | null) => {
+    setSelectedApp(app)
+    form.setValue('appId', app?.id || '')
   }
 
   // 监听菜单类型变化，如果是模块则清空并禁用父级菜单
@@ -134,6 +149,8 @@ export function CreateMenuDrawer({ open, onOpenChange, onSubmit, menuTypeOptions
         onSubmit?.(data)
         onOpenChange(false)
         form.reset()
+        setSelectedParentMenu(null)
+        setSelectedApp(null)
       } else {
         console.log('菜单创建失败，code:', response.code, 'msg:', response.msg)
         toast.error(response.msg || '创建失败')
@@ -220,7 +237,7 @@ export function CreateMenuDrawer({ open, onOpenChange, onSubmit, menuTypeOptions
                     
                     return (
                       <FormItem className="flex items-center gap-3">
-                        <FormLabel className="w-[80px] text-right shrink-0">父级菜单</FormLabel>
+                        <FormLabel className="w-20 text-right shrink-0">父级菜单</FormLabel>
                         <div className="flex-1">
                           <FormControl>
                             <div className="relative">
@@ -263,15 +280,39 @@ export function CreateMenuDrawer({ open, onOpenChange, onSubmit, menuTypeOptions
               />
 
               {/* 第五行：图标和应用ID */}
-              <FormFields
-                control={form.control}
-                columns={2}
-                gap="gap-8"
-                fields={[
-                  { name: 'icon', label: '图标', placeholder: '例如: menu' },
-                  { name: 'appId', label: '应用ID', placeholder: '请输入应用ID' },
-                ]}
-              />
+              <div className="grid grid-cols-2 gap-8">
+                <FormFieldWrapper
+                  control={form.control}
+                  config={{
+                    name: 'icon',
+                    label: '图标',
+                    placeholder: '例如: menu',
+                  }}
+                />
+                <FormField
+                  control={form.control}
+                  name="appId"
+                  render={() => (
+                    <FormItem className="flex items-center gap-3">
+                      <FormLabel className="w-20 text-right shrink-0">应用ID</FormLabel>
+                      <div className="flex-1">
+                        <FormControl>
+                          <div className="relative">
+                            <Input
+                              value={selectedApp?.appName || ''}
+                              placeholder="点击选择应用"
+                              readOnly
+                              onClick={handleOpenAppSelector}
+                              className="cursor-pointer"
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               {/* 第六行：开关选项 */}
               <FormFields
@@ -308,6 +349,8 @@ export function CreateMenuDrawer({ open, onOpenChange, onSubmit, menuTypeOptions
             onClick={() => {
               form.reset()
               form.clearErrors()
+              setSelectedParentMenu(null)
+              setSelectedApp(null)
               onOpenChange(false)
             }}
           >
@@ -334,6 +377,13 @@ export function CreateMenuDrawer({ open, onOpenChange, onSubmit, menuTypeOptions
         const selectedType = menuTypeOptions.find(opt => opt.value === menuType)
         return selectedType ? parseInt(selectedType.code) : undefined
       })()}
+    />
+
+    {/* 应用选择对话框 */}
+    <AppSelector
+      open={appSelectorOpen}
+      onOpenChange={setAppSelectorOpen}
+      onSelect={handleSelectApp}
     />
     </>
   )

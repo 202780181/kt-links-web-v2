@@ -233,11 +233,10 @@ const OrganizationPage = () => {
 
   // 处理刷新
   const handleRefresh = () => {
-    setSearchName('')
-    setSearchQuery('') // 同时清空搜索查询
     setCursorId(undefined)
     setCursorCreateTs(undefined)
     setCursorType(undefined)
+		mutate()
   }
 
   // 处理添加

@@ -48,6 +48,7 @@ interface DataTableProps<TData, TValue> {
   emptyMessage?: string
   loadingMessage?: string
   tableHeight?: string | number  // 自定义表格高度，如 '500px' 或 500
+  enableRowClick?: boolean  // 启用点击行选中，默认false
 }
 
 export function DataTable<TData, TValue>({
@@ -63,6 +64,7 @@ export function DataTable<TData, TValue>({
   emptyMessage = '暂无数据',
   loadingMessage = '加载中...',
   tableHeight,
+  enableRowClick = false,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -164,6 +166,13 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
+                  className={enableRowClick ? 'cursor-pointer hover:bg-muted/50' : ''}
+                  onClick={enableRowClick ? () => {
+                    // 清除所有选择
+                    table.toggleAllRowsSelected(false)
+                    // 选中当前行
+                    row.toggleSelected(true)
+                  } : undefined}
                 >
                   {row.getVisibleCells().map((cell) => {
                     const meta = cell.column.columnDef.meta as any
