@@ -20,6 +20,8 @@ const MenuDetailPage = lazy(() => import('@/pages/menu/detail'))
 const ApplicationPage = lazy(() => import('@/pages/application'))
 const PermissionsPage = lazy(() => import('@/pages/permissions'))
 const UserPage = lazy(() => import('@/pages/user'))
+const OrganizationPage = lazy(() => import('@/pages/organization'))
+const OrganizationDetailPage = lazy(() => import('@/pages/organization/detail'))
 const AccountInfoPage = lazy(() => import('@/pages/account/InfoPage'))
 const AccountVerificationPage = lazy(() => import('@/pages/account/VerificationPage'))
 const AccountSecurityPage = lazy(() => import('@/pages/account/SecurityPage'))
@@ -82,10 +84,15 @@ export const routesConfig: RouteConfig[] = [
   },
   {
     path: '/organizations',
-    component: HomePage, // 暂时使用 HomePage，后续替换
+    component: OrganizationPage,
     title: '组织管理',
     icon: Building2,
     showInSidebar: true,
+  },
+  {
+    path: '/organizations/:id',
+    component: OrganizationDetailPage,
+    showInSidebar: false, // 详情页不在侧边栏显示
   },
 ]
 

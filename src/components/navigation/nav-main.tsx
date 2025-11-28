@@ -71,7 +71,10 @@ export function NavMain({
           }
 
           // 如果没有子菜单，直接渲染为链接
-          const isActive = location.pathname === item.url || item.isActive
+          // 支持路径前缀匹配，例如 /organizations 应该匹配 /organizations/123
+          const isActive = location.pathname === item.url || 
+                           (item.url !== '/' && location.pathname.startsWith(item.url + '/')) ||
+                           item.isActive
           return (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton asChild isActive={isActive}>

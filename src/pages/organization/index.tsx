@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router'
 import { type ColumnDef } from '@tanstack/react-table'
 import {
   IconPlus,
@@ -7,15 +8,17 @@ import {
   IconLoader2
 } from '@tabler/icons-react'
 import useSWR from 'swr'
-
 import { toast } from 'sonner'
 import useSWRMutation from 'swr/mutation'
+
 import {
-  fetchAuthCodePageList,
-  fetchDeleteAuthCode,
-  type AuthCodeItem,
-  type AuthCodePageParams,
-} from '@/api/permissions'
+  fetchOrgPageList,
+  fetchDeleteOrg,
+  getOrgTypeText,
+  type OrgItem,
+  type OrgPageParams,
+} from '@/api/organization'
+import { CreateOrgDrawer } from './CreateOrg'
 import { formatTimestamp } from '@/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -24,11 +27,10 @@ import { Input } from '@/components/ui/input'
 import { DataTable } from '@/components/table'
 import { ListPageContainer } from '@/components/list-page-warpper'
 import { DeleteConfirmButton } from '@/components/ui/delete-confirm'
-import { CreatePermissionDrawer } from './CreatePermission'
 
 // 删除操作组件
 const DeleteAction = ({ id, onDeleted }: { id: string, onDeleted: () => void }) => {
-  const { trigger, isMutating } = useSWRMutation('/api/auth/a-code/delete', fetchDeleteAuthCode)
+  const { trigger, isMutating } = useSWRMutation('/api/sys/org/delete', fetchDeleteOrg)
 
   const handleDelete = async () => {
     try {
@@ -43,8 +45,8 @@ const DeleteAction = ({ id, onDeleted }: { id: string, onDeleted: () => void }) 
 
   return (
     <DeleteConfirmButton
-      title="删除权限码"
-      description="确定要删除这个权限码吗？此操作无法撤销。"
+      title="删除组织"
+      description="确定要删除这个组织吗？此操作无法撤销。"
       onConfirm={handleDelete}
     >
       <Button 
@@ -68,9 +70,10 @@ const DeleteAction = ({ id, onDeleted }: { id: string, onDeleted: () => void }) 
 
 // 定义表格列
 const createColumns = (
-  onEdit: (item: AuthCodeItem) => void,
+  onNameClick: (orgItem: OrgItem) => void,
+  onEdit: (item: OrgItem) => void,
   onDeleted: () => void
-): ColumnDef<AuthCodeItem>[] => [
+): ColumnDef<OrgItem>[] => [
   {
     id: 'select',
     size: 50,
@@ -99,103 +102,76 @@ const createColumns = (
     enableHiding: false,
   },
   {
-    accessorKey: 'name',
-    size: 150,
-    header: '权限码名称',
+    accessorKey: 'orgName',
+    size: 200,
+    header: '组织名称',
     cell: ({ row }) => (
-      <div className="font-medium">{row.getValue('name')}</div>
+      <Button
+        variant="link"
+        className="p-0 h-auto font-medium text-primary hover:underline justify-start"
+        onClick={() => onNameClick(row.original)}
+      >
+        {row.getValue('orgName')}
+      </Button>
     ),
     enableHiding: false,
   },
   {
-    accessorKey: 'authCodeStatus',
-    size: 80,
-    header: '状态',
+    accessorKey: 'orgType',
+    size: 120,
+    header: '组织类型',
     cell: ({ row }) => {
-      const status = row.getValue('authCodeStatus') as number
+      const type = row.getValue('orgType') as number
       return (
-        <Badge variant='secondary'>
-          {status === 1 ? '启用' : '禁用'}
+				<Badge variant='secondary'>
+          {getOrgTypeText(type)}
         </Badge>
       )
     },
   },
   {
-    accessorKey: 'moduleCode',
-    size: 120,
-    header: '模块码',
+    accessorKey: 'parentId',
+    size: 150,
+    header: '父级组织ID',
     cell: ({ row }) => (
-      <div className="text-sm text-muted-foreground">
-        {row.getValue('moduleCode') || '-'}
-      </div>
-    ),
-  },
-  {
-    accessorKey: 'groupCode',
-    size: 120,
-    header: '组码',
-    cell: ({ row }) => (
-      <div className="text-sm text-muted-foreground">
-        {row.getValue('groupCode') || '-'}
-      </div>
-    ),
-  },
-  {
-    accessorKey: 'actionCode',
-    size: 120,
-    header: '动作码',
-    cell: ({ row }) => (
-      <div className="text-sm text-muted-foreground">
-        {row.getValue('actionCode') || '-'}
-      </div>
-    ),
-  },
-  {
-    accessorKey: 'category',
-    size: 100,
-    header: '类别',
-    cell: ({ row }) => (
-      <Badge variant="outline">
-        {row.getValue('category') || '-'}
-      </Badge>
-    ),
-  },
-  {
-    accessorKey: 'defaultEffect',
-    size: 100,
-    header: '默认效果',
-    cell: ({ row }) => (
-      <Badge variant="outline">
-        {row.getValue('defaultEffect') || '-'}
-      </Badge>
-    ),
-  },
-  {
-    accessorKey: 'autoAssign',
-    size: 100,
-    header: '自动授权',
-    cell: ({ row }) => (
-      <Badge variant="outline">
-        {row.getValue('autoAssign') || '-'}
-      </Badge>
+      <span className="font-mono text-sm">
+        {row.getValue('parentId') || '-'}
+      </span>
     ),
   },
   {
     accessorKey: 'createTs',
-    size: 160,
+    size: 180,
     header: '创建时间',
     cell: ({ row }) => (
-      <div className="text-sm text-muted-foreground">
+      <span className="text-sm text-muted-foreground">
         {formatTimestamp(row.getValue('createTs'))}
-      </div>
+      </span>
+    ),
+  },
+  {
+    accessorKey: 'updateTs',
+    size: 180,
+    header: '更新时间',
+    cell: ({ row }) => (
+      <span className="text-sm text-muted-foreground">
+        {formatTimestamp(row.getValue('updateTs'))}
+      </span>
     ),
   },
   {
     id: 'actions',
-    size: 120,
-    header: () => <div className="text-center">操作</div>,
+    size: 180,
+    header: '操作',
     cell: ({ row }) => (
-      <div className="flex items-center justify-center">
+      <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onNameClick(row.original)}
+        >
+          查看
+        </Button>
         <Button
           variant="ghost"
           size="sm"
@@ -207,33 +183,35 @@ const createColumns = (
       </div>
     ),
     meta: {
-      sticky: 'right', // 固定在右侧
+      sticky: 'right',
     },
   },
 ]
 
-const PermissionsPage = () => {
+const OrganizationPage = () => {
+  const navigate = useNavigate()
   const [searchName, setSearchName] = useState('')
+  const [searchQuery, setSearchQuery] = useState('') // 实际用于搜索的状态
   const [pageSize, setPageSize] = useState(50)
   const [cursorId, setCursorId] = useState<string | undefined>()
   const [cursorCreateTs, setCursorCreateTs] = useState<string | undefined>()
   const [cursorType, setCursorType] = useState<string | undefined>()
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [editingItem, setEditingItem] = useState<AuthCodeItem | null>(null)
+  const [editingItem, setEditingItem] = useState<OrgItem | null>(null)
 
   // 构建请求参数 - 使用 JSON 字符串作为 key 以避免对象引用问题
-  const params: AuthCodePageParams = {
+  const params: OrgPageParams = {
     size: pageSize,
     cursorId,
     cursorCreateTs,
     cursorType,
-    name_like: searchName || undefined,
+    groupName: searchQuery || undefined,
   }
 
-  // 使用 JSON.stringify 作为 key
+  // 使用 SWR
   const { data: response, isLoading, isValidating, mutate } = useSWR(
-    ['/api/auth/a-code/list', JSON.stringify(params)],
-    () => fetchAuthCodePageList(params),
+    ['/api/sys/org/page-list', JSON.stringify(params)],
+    () => fetchOrgPageList(params),
     {
       revalidateOnFocus: false,
     }
@@ -247,19 +225,19 @@ const PermissionsPage = () => {
 
   // 处理搜索
   const handleSearch = () => {
+    setSearchQuery(searchName) // 只在搜索时更新实际查询参数
     setCursorId(undefined)
     setCursorCreateTs(undefined)
     setCursorType(undefined)
-    mutate()
   }
 
   // 处理刷新
   const handleRefresh = () => {
     setSearchName('')
+    setSearchQuery('') // 同时清空搜索查询
     setCursorId(undefined)
     setCursorCreateTs(undefined)
     setCursorType(undefined)
-    mutate()
   }
 
   // 处理添加
@@ -269,9 +247,21 @@ const PermissionsPage = () => {
   }
 
   // 处理编辑
-  const handleEdit = (item: AuthCodeItem) => {
+  const handleEdit = (item: OrgItem) => {
     setEditingItem(item)
     setDrawerOpen(true)
+  }
+
+  // 处理抽屉提交
+  const handleDrawerSubmit = () => {
+    mutate()
+  }
+
+  // 处理名称点击 - 跳转到详情页，传递组织信息
+  const handleNameClick = (orgItem: OrgItem) => {
+    navigate(`/organizations/${orgItem.id}`, { 
+      state: { orgItem } 
+    })
   }
 
   // 处理上一页
@@ -299,27 +289,21 @@ const PermissionsPage = () => {
     setPageSize(newSize)
   }
 
-  // 处理抽屉提交
-  const handleDrawerSubmit = () => {
-    mutate()
-  }
-
-  const columns = createColumns(handleEdit, () => mutate())
+  const columns = createColumns(handleNameClick, handleEdit, () => mutate())
 
   return (
-    <>
     <ListPageContainer
       toolbar={
         <div className="flex items-center gap-2">
           <Button size="sm" variant="outline" onClick={handleAdd}>
             <IconPlus className="h-4 w-4"/>
-            <span className="hidden lg:inline">添加</span>
+            <span className="hidden lg:inline">添加组织</span>
           </Button>
           <div className="flex-1 flex items-center gap-2 justify-end">
             <div className="relative w-64">
               <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="搜索权限码名称"
+                placeholder="搜索组织名称"
                 value={searchName}
                 onChange={(e) => setSearchName(e.target.value)}
                 onKeyDown={(e) => {
@@ -330,7 +314,7 @@ const PermissionsPage = () => {
                 className="pl-9"
               />
             </div>
-              <Button variant="outline" size="icon" onClick={handleRefresh} disabled={isLoading || isValidating}>
+            <Button variant="outline" size="icon" onClick={handleRefresh} disabled={isLoading || isValidating}>
               {isValidating ? (
                 <IconLoader2 className="h-4 w-4 animate-spin" />
               ) : (
@@ -356,17 +340,15 @@ const PermissionsPage = () => {
           onNextPage: handleNextPage,
         }}
       />
-    </ListPageContainer>
 
-    {/* 新增/编辑权限码抽屉 */}
-    <CreatePermissionDrawer
-      open={drawerOpen}
-      onOpenChange={setDrawerOpen}
-      onSubmit={handleDrawerSubmit}
-      editData={editingItem}
-    />
-    </>
+      <CreateOrgDrawer
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+        editData={editingItem}
+        onSubmit={handleDrawerSubmit}
+      />
+    </ListPageContainer>
   )
 }
 
-export default PermissionsPage
+export default OrganizationPage

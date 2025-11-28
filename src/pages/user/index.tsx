@@ -4,11 +4,10 @@ import {
   IconPlus,
   IconRefresh,
   IconSearch,
-  IconLoader2,
 } from '@tabler/icons-react'
 import { toast } from 'sonner'
 
-import { formatTimestamp } from '@/utils'
+
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -162,7 +161,7 @@ const createColumns = (
 
 export default function UserPage() {
   const [searchValue, setSearchValue] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [loading] = useState(false)
 
   // 模拟数据
   const mockData: UserData[] = [
@@ -211,7 +210,7 @@ export default function UserPage() {
   }
 
   // 处理删除
-  const handleDelete = (id: string, name: string) => {
+  const handleDelete = (_id: string, name: string) => {
     toast.success(`用户"${name}"删除成功`)
     // TODO: 实现删除逻辑
   }
@@ -266,16 +265,12 @@ export default function UserPage() {
               />
             </div>
             <Button
-              variant="ghost"
+							variant="outline"
               size="icon"
               onClick={handleRefresh}
               disabled={loading}
             >
-              {loading ? (
-                <IconLoader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <IconRefresh className="h-4 w-4" />
-              )}
+							<IconRefresh className="h-4 w-4" />
             </Button>
           </div>
         </div>
